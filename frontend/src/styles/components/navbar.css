@@ -1,0 +1,132 @@
+
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--nav-h);
+  background: rgba(254,254,254,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: var(--line);
+}
+
+.navbar__inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 100%; max-width: 1060px; margin: 0 auto;
+  padding: 0 var(--s5); gap: var(--s4);
+}
+
+
+.navbar__logo {
+  font-family: var(--display);
+  font-size: 19px; font-weight: var(--w-black);
+  letter-spacing: -.04em; line-height: 1;
+  display: flex; align-items: baseline; gap: 1px;
+  flex-shrink: 0;
+}
+.navbar__logo-dev    { color: var(--ink-900); }
+.navbar__logo-angola { color: var(--red); }
+
+.navbar__logo::after {
+  content: '.ao';
+  font-size: 10px; font-weight: var(--w-bold);
+  color: var(--gold); letter-spacing: 0;
+  margin-left: 2px; align-self: flex-end; margin-bottom: 2px;
+}
+
+
+.navbar__nav { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
+
+.navbar__link {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: 6px 13px; border-radius: var(--r-xs);
+  font-size: var(--t-sm); font-weight: var(--w-medium);
+  color: var(--ink-500);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.navbar__link:hover { background: var(--ink-50); color: var(--ink-900); }
+.navbar__link--active { background: var(--ink-900); color: var(--white); }
+.navbar__link .icon  { width: 15px; height: 15px; }
+
+
+.navbar__badge {
+  min-width: 16px; height: 16px;
+  background: var(--red); color: var(--white);
+  border-radius: var(--r-full);
+  font-size: 9px; font-weight: var(--w-black);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px; line-height: 1;
+}
+
+
+.navbar__actions { display: flex; align-items: center; gap: var(--s3); flex-shrink: 0; }
+
+.navbar__new {
+  display: flex; align-items: center; gap: var(--s2);
+  background: var(--red); color: var(--white);
+  font-size: var(--t-sm); font-weight: var(--w-bold);
+  padding: 0 var(--s4); height: 34px;
+  border-radius: var(--r-xs);
+  transition: background var(--t-fast), box-shadow var(--t-fast);
+}
+.navbar__new:hover { background: var(--red-dim); box-shadow: 0 4px 12px rgba(196,28,0,.25); }
+.navbar__new .icon { width: 13px; height: 13px; }
+
+
+.navbar__user { position: relative; }
+.navbar__trigger {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: 3px 10px 3px 3px;
+  border-radius: var(--r-full); border: var(--line);
+  background: var(--white); cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.navbar__trigger:hover { background: var(--ink-50); }
+
+.navbar__trigger-name {
+  font-size: var(--t-sm); font-weight: var(--w-bold);
+  color: var(--ink-800); max-width: 90px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+
+.navbar__drop {
+  display: none; position: absolute; right: 0; top: calc(100% + 8px);
+  background: var(--white); border: var(--line);
+  border-radius: var(--r-md); box-shadow: var(--shadow-lg);
+  min-width: 200px; padding: var(--s2) 0;
+  animation: dropIn .15s var(--ease-out); z-index: 300;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.navbar__user:hover .navbar__drop,
+.navbar__user:focus-within .navbar__drop { display: block; }
+
+.navbar__drop-header {
+  padding: var(--s3) var(--s4) var(--s2);
+  border-bottom: var(--line);
+  margin-bottom: var(--s1);
+}
+.navbar__drop-name  { font-size: var(--t-sm); font-weight: var(--w-bold); color: var(--ink-900); }
+.navbar__drop-email { font-size: var(--t-xs); color: var(--ink-400); margin-top: 2px; }
+
+.navbar__drop-item {
+  display: flex; align-items: center; gap: var(--s2);
+  width: 100%; padding: var(--s2) var(--s4);
+  font-size: var(--t-sm); font-weight: var(--w-medium);
+  color: var(--ink-700); cursor: pointer;
+  background: none; border: none; font-family: var(--body);
+  transition: background var(--t-fast);
+  text-decoration: none;
+}
+.navbar__drop-item:hover { background: var(--ink-50); }
+.navbar__drop-item--red { color: var(--red); }
+.navbar__drop-item--red:hover { background: var(--red-soft); }
+.navbar__drop-item .icon { width: 14px; height: 14px; }
+
+
+@media (max-width: 680px) {
+  .navbar__nav  { display: none; }
+  .navbar__new span { display: none; }
+  .navbar__trigger-name { display: none; }
+}

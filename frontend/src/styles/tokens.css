@@ -1,0 +1,486 @@
+/* ============================================================
+   tokens.css — DevAngola Design System
+   Fonte única de verdade para cores, espaços e tipografia.
+   O dark mode sobrepõe APENAS as variáveis que mudam.
+   ============================================================ */
+
+:root {
+  /* ── Marca ── */
+  --red: #c41c00;
+  --red-dim: #9e1600;
+  --red-soft: rgba(196, 28, 0, 0.08);
+  --red-border: rgba(196, 28, 0, 0.2);
+  --gold: #c8860a;
+  --gold-soft: rgba(200, 134, 10, 0.1);
+
+  /* ── Superfícies (light) ── */
+  --bg: #f8f7f5;
+  --surface: #ffffff;
+  --surface-2: #f2f1ef;
+
+  /* ── Escala de tinta (light) ── */
+  --ink-900: #111111;
+  --ink-800: #1c1c1c;
+  --ink-700: #2e2e2e;
+  --ink-600: #4a4a4a;
+  --ink-500: #6b6b6b;
+  --ink-400: #909090;
+  --ink-300: #b8b8b8;
+  --ink-200: #d8d8d8;
+  --ink-100: #ebebeb;
+  --ink-50: #f5f5f5;
+  --white: #fefefe;
+
+  /* ── Bordas ── */
+  --line: 1px solid #e4e4e4;
+  --line-dark: 1px solid #c8c8c8;
+  --line-brand: 1.5px solid var(--red);
+
+  /* ── Sombras ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.16);
+
+  /* ── Raios ── */
+  --r-xs: 3px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-full: 9999px;
+
+  /* ── Tipografia ── */
+  --display: "Bricolage Grotesque", sans-serif;
+  --body: "Geist", "Geist Sans", sans-serif;
+  --t-xs: 11px;
+  --t-sm: 13px;
+  --t-base: 15px;
+  --t-md: 17px;
+  --t-lg: 21px;
+  --t-xl: 26px;
+  --t-2xl: 32px;
+  --t-3xl: 42px;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-bold: 700;
+  --w-black: 800;
+
+  /* ── Espaçamento ── */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --s12: 48px;
+  --s16: 64px;
+
+  /* ── Transições ── */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 100ms;
+  --t-base-dur: 180ms;
+  --t-slow: 320ms;
+
+  /* ── Layout ── */
+  --nav-h: 58px;
+  --overlay: rgba(8, 8, 8, 0.48);
+
+  /* ── Badges de nível ── */
+  --badge-iniciante-bg: #e6f4ea;
+  --badge-iniciante-text: #1e5631;
+  --badge-junior-bg: #e8f0fe;
+  --badge-junior-text: #1a3a8a;
+  --badge-pleno-bg: #fef7e0;
+  --badge-pleno-text: #7b4f00;
+  --badge-senior-bg: #f3e8ff;
+  --badge-senior-text: #4a1580;
+}
+
+/* ============================================================
+   DARK THEME
+   Activo via: document.documentElement.setAttribute('data-theme','dark')
+   Todas as cores com valores fixos (hex/rgb) são substituídas.
+   Variáveis que dependem de outras (var(--red)) herdam automaticamente.
+   ============================================================ */
+[data-theme="dark"] {
+  /* Superfícies */
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+
+  /* Tinta invertida */
+  --ink-900: #f2f2f2;
+  --ink-800: #dedede;
+  --ink-700: #c0c0c0;
+  --ink-600: #a0a0a0;
+  --ink-500: #808080;
+  --ink-400: #606060;
+  --ink-300: #444444;
+  --ink-200: #333333;
+  --ink-100: #262626;
+  --ink-50: #1e1e1e;
+  --white: #161616;
+
+  /* Bordas escuras */
+  --line: 1px solid #2a2a2a;
+  --line-dark: 1px solid #3a3a3a;
+
+  /* Sombras mais pronunciadas */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.65);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.75);
+
+  /* Overlay mais escuro */
+  --overlay: rgba(0, 0, 0, 0.72);
+
+  /* Badges ajustados para dark */
+  --badge-iniciante-bg: rgba(30, 86, 49, 0.25);
+  --badge-iniciante-text: #6ee7a0;
+  --badge-junior-bg: rgba(26, 58, 138, 0.25);
+  --badge-junior-text: #93c5fd;
+  --badge-pleno-bg: rgba(123, 79, 0, 0.25);
+  --badge-pleno-text: #fcd34d;
+  --badge-senior-bg: rgba(74, 21, 128, 0.25);
+  --badge-senior-text: #c084fc;
+}
+
+/* ── Aplicação do dark mode nos elementos base ── */
+/* body e html */
+[data-theme="dark"] body {
+  background: var(--bg);
+  color: var(--ink-900);
+}
+
+/* Cards */
+[data-theme="dark"] .card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+
+/* Inputs, selects, textareas */
+[data-theme="dark"] .input,
+[data-theme="dark"] .select,
+[data-theme="dark"] .textarea {
+  background: var(--surface-2);
+  color: var(--ink-900);
+  border-color: #333333;
+}
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .select:focus,
+[data-theme="dark"] .textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(196, 28, 0, 0.15);
+}
+[data-theme="dark"] .input::placeholder,
+[data-theme="dark"] .textarea::placeholder {
+  color: var(--ink-400);
+}
+
+/* Navbar */
+[data-theme="dark"] .navbar {
+  background: rgba(13, 13, 13, 0.92);
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .navbar__drop {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .navbar__trigger {
+  background: var(--surface-2);
+  border-color: #333;
+}
+[data-theme="dark"] .navbar__link:hover,
+[data-theme="dark"] .navbar__drop-item:hover {
+  background: #262626;
+}
+
+/* Botões secundários e ghost */
+[data-theme="dark"] .btn--secondary {
+  background: var(--surface-2);
+  border-color: #333;
+  color: var(--ink-700);
+}
+[data-theme="dark"] .btn--secondary:hover {
+  background: #262626;
+  border-color: #444;
+}
+[data-theme="dark"] .btn--ghost:hover {
+  background: #262626;
+}
+
+/* Páginas de autenticação */
+[data-theme="dark"] .auth-page {
+  background: var(--bg);
+}
+[data-theme="dark"] .auth-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+
+/* Feed */
+[data-theme="dark"] .composer {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .composer__fake {
+  background: var(--surface-2);
+  border-color: #333;
+  color: var(--ink-500);
+}
+[data-theme="dark"] .sidebar-rooms {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .sidebar-me {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+
+/* Post cards */
+[data-theme="dark"] .post-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .post-card__foot {
+  border-top-color: #2a2a2a;
+}
+[data-theme="dark"] .post-card__title {
+  color: var(--ink-900);
+}
+[data-theme="dark"] .post-card:hover .post-card__title {
+  color: var(--red);
+}
+[data-theme="dark"] .action-btn {
+  background: var(--surface-2);
+  border-color: #333;
+  color: var(--ink-600);
+}
+[data-theme="dark"] .cmt-form .input {
+  background: var(--surface-2);
+}
+
+/* Modais */
+[data-theme="dark"] .modal-box {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+/* Tabela admin */
+[data-theme="dark"] .a-table th {
+  background: var(--surface-2);
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .a-table td {
+  border-bottom-color: #222;
+}
+[data-theme="dark"] .a-table tr:hover td {
+  background: #1e1e1e;
+}
+[data-theme="dark"] .a-btn--gray {
+  background: #262626;
+  color: var(--ink-700);
+}
+[data-theme="dark"] .a-select {
+  background: var(--surface-2);
+  color: var(--ink-900);
+  border-color: #333;
+}
+[data-theme="dark"] .admin-search {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .admin-table {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+
+/* Mensagens */
+[data-theme="dark"] .messages-sidebar {
+  background: var(--surface);
+  border-right-color: #2a2a2a;
+}
+[data-theme="dark"] .messages-sidebar__head {
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .conv-item {
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .conv-item:hover {
+  background: #1e1e1e;
+}
+[data-theme="dark"] .conv-item--active {
+  background: rgba(196, 28, 0, 0.12);
+}
+[data-theme="dark"] .messages-main {
+  background: #111;
+}
+[data-theme="dark"] .messages-header {
+  background: var(--surface);
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .messages-composer {
+  background: var(--surface);
+  border-top-color: #2a2a2a;
+}
+[data-theme="dark"] .msg-bubble__text {
+  background: var(--surface-2);
+  border-color: #333;
+  color: var(--ink-900);
+}
+
+/* Perfil */
+[data-theme="dark"] .profile-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .profile-row {
+  border-bottom-color: #2a2a2a;
+}
+[data-theme="dark"] .profile-identifier-wrap {
+  border-bottom-color: #2a2a2a;
+}
+
+/* Configurações */
+[data-theme="dark"] .settings-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .settings-divider {
+  background: #2a2a2a;
+}
+[data-theme="dark"] .theme-opt {
+  border-color: #333;
+}
+[data-theme="dark"] .theme-opt__footer {
+  background: var(--surface-2);
+  border-top-color: #2a2a2a;
+  color: var(--ink-700);
+}
+[data-theme="dark"] .lang-opt {
+  border-color: #333;
+  color: var(--ink-700);
+}
+[data-theme="dark"] .lang-opt:hover {
+  background: #1e1e1e;
+}
+
+/* Rankings + salas */
+[data-theme="dark"] .ranking-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .ranking-formula {
+  background: var(--surface-2);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .sala-members__list .card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .member-row {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .user-row {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+
+/* Newpost */
+[data-theme="dark"] .newpost-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .upload-zone {
+  border-color: #333;
+}
+[data-theme="dark"] .upload-zone:hover {
+  background: rgba(196, 28, 0, 0.08);
+  border-color: var(--red);
+}
+[data-theme="dark"] .open-source-box {
+  background: rgba(200, 134, 10, 0.08);
+  border-color: rgba(200, 134, 10, 0.2);
+}
+
+/* Detail post */
+[data-theme="dark"] .detail-post {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .detail-comments {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .detail-cmt {
+  border-top-color: #2a2a2a;
+}
+
+/* Notificações */
+[data-theme="dark"] .notif-item {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .notif-item--unread {
+  background: rgba(196, 28, 0, 0.1);
+}
+
+/* Ranking redesign – dark */
+[data-theme="dark"] .rank-podium__item {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .rank-podium__item--center {
+  border-color: #7a4f00;
+  box-shadow: 0 4px 24px rgba(200, 134, 10, 0.12);
+}
+[data-theme="dark"] .rank-row {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .rank-row__score {
+  background: #1e1e1e;
+  border-color: #333;
+}
+[data-theme="dark"] .rank-formula {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .rank-formula__item--posts {
+  background: #1e1e1e;
+  color: var(--ink-700);
+}
+[data-theme="dark"] .rank-formula__item--likes {
+  background: rgba(196, 28, 0, 0.15);
+  color: #ff6b6b;
+}
+[data-theme="dark"] .rank-header__trophy {
+  background: linear-gradient(135deg, #2a2000, #3a2800);
+}
+
+/* Perfil público – dark */
+[data-theme="dark"] .pubprofile-card {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}
+[data-theme="dark"] .pubprofile-stats {
+  border-top-color: #2a2a2a;
+}
+[data-theme="dark"] .pubprofile-identifier {
+  background: #1e1e1e;
+  border-color: #333;
+}
+[data-theme="dark"] .pubprofile-post {
+  background: var(--surface);
+  border-color: #2a2a2a;
+}

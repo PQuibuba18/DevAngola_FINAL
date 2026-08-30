@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name":        "DevAngola",
+    "slug":        "devangola",
+    "version":     "1.0.0",
+    "orientation": "portrait",
+    "icon":        "./assets/images/icon.png",
+    "scheme":      "devangola",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image":           "./assets/images/splash.png",
+      "resizeMode":      "contain",
+      "backgroundColor": "#C41C00"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#C41C00"
+      },
+      "package":            "ao.devangola.app",
+      "versionCode":        1,
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "googleServicesFile": "./google-services.json"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-image-picker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O DevAngola precisa de acesso às tuas fotos para actualizar o teu avatar e publicar imagens nos posts."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "SUBSTITUI_PELO_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

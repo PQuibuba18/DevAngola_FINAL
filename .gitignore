@@ -1,0 +1,28 @@
+# Credenciais — nunca commitar
+.env
+*.env.local
+*.env.production
+
+# Dependências
+node_modules/
+*/node_modules/
+
+# Build
+frontend/build/
+mobile/build/
+
+# Uploads locais
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
