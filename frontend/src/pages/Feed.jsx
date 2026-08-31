@@ -34,7 +34,7 @@ export default function Feed() {
         activeTab === "following" ? "/posts?feed=following" : "/posts";
       api
         .get(url)
-        .then((r) => setPosts(r.data))
+        .then((r) => setPosts(Array.isArray(r.data) ? r.data : (r.data.posts ?? [])))
         .catch(() => setError(t.genericError || "Erro ao carregar posts."))
         .finally(() => setLoading(false));
     },
