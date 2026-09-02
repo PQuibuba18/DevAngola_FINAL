@@ -20,6 +20,18 @@ export default function Verificacao() {
   // Se já está verificado, vai para o feed
   useEffect(() => {
     if (user?.verified) { navigate('/feed'); return; }
+
+    // Admin: verificação automática sem documento
+    if (user?.role === 'admin') {
+      api.post('/verification/submit', new FormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }).then(r => {
+        if (r.data.verified) updateUser({ verified: true });
+        navigate('/feed');
+      }).catch(() => navigate('/feed'));
+      return;
+    }
+
     api.get('/verification/status').then(r => setStatus(r.data)).catch(() => setStatus({ status: 'not_submitted' }));
   }, [user, navigate]);
 
