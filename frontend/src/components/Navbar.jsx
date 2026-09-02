@@ -2,8 +2,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LanguageContext';
 import Avatar from './ui/Avatar';
-import { IconHome, IconGrid, IconUsers, IconMessage, IconPlus,
-         IconUser, IconLogout, IconSettings, IconShield, IconTrophy } from './ui/Icons';
+import {
+  IconHome, IconGrid, IconUsers, IconMessage, IconPlus,
+  IconUser, IconLogout, IconSettings, IconShield, IconTrophy, IconBriefcase,
+} from './ui/Icons';
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
@@ -22,21 +24,38 @@ export default function Navbar() {
           <span className="navbar__logo-dev">Dev</span>
           <span className="navbar__logo-angola">Angola</span>
         </Link>
+
         <nav className="navbar__nav">
-          <Link to="/feed"       className={cls('/feed')}>      <IconHome    className="icon icon--sm" /> {t.feed}      </Link>
-          <Link to="/salas"      className={cls('/salas')}>     <IconGrid    className="icon icon--sm" /> {t.rooms}     </Link>
-          <Link to="/usuarios"   className={cls('/usuarios')}>  <IconUsers   className="icon icon--sm" /> {t.users}     </Link>
-          <Link to="/ranking"    className={cls('/ranking')}>   <IconTrophy  className="icon icon--sm" /> {t.ranking}   </Link>
-          <Link to="/mensagens"  className={cls('/mensagens')}> <IconMessage className="icon icon--sm" /> {t.messages}  </Link>
+          <Link to="/feed"      className={cls('/feed')}>
+            <IconHome      className="icon icon--sm" /> {t.feed}
+          </Link>
+          <Link to="/vagas"     className={cls('/vagas')}>
+            <IconBriefcase className="icon icon--sm" /> {t.jobs || 'Vagas'}
+          </Link>
+          <Link to="/salas"     className={cls('/salas')}>
+            <IconGrid      className="icon icon--sm" /> {t.rooms}
+          </Link>
+          <Link to="/usuarios"  className={cls('/usuarios')}>
+            <IconUsers     className="icon icon--sm" /> {t.users}
+          </Link>
+          <Link to="/ranking"   className={cls('/ranking')}>
+            <IconTrophy    className="icon icon--sm" /> {t.ranking}
+          </Link>
+          <Link to="/mensagens" className={cls('/mensagens')}>
+            <IconMessage   className="icon icon--sm" /> {t.messages}
+          </Link>
           {isAdmin && (
-            <Link to="/admin" className={cls('/admin')} style={{ color:'var(--red)', fontWeight:700 }}>
+            <Link to="/admin" className={cls('/admin')}
+              style={{ color: 'var(--red)', fontWeight: 700 }}>
               <IconShield className="icon icon--sm" /> Admin
             </Link>
           )}
         </nav>
+
         <div className="navbar__actions">
           <Link to="/novo-post" className="navbar__new">
-            <IconPlus className="icon icon--sm" /><span>{t.publish}</span>
+            <IconPlus className="icon icon--sm" />
+            <span>{t.publish}</span>
           </Link>
           <div className="navbar__user">
             <button className="navbar__trigger">
@@ -48,9 +67,17 @@ export default function Navbar() {
                 <div className="navbar__drop-name">{user?.name}</div>
                 <div className="navbar__drop-email">{user?.email}</div>
               </div>
-              <Link to="/perfil"        className="navbar__drop-item"><IconUser     className="icon icon--sm" /> {t.profile}</Link>
-              <Link to="/configuracoes" className="navbar__drop-item"><IconSettings className="icon icon--sm" /> {t.settings}</Link>
-              {isAdmin && <Link to="/admin" className="navbar__drop-item"><IconShield className="icon icon--sm" /> {t.adminPanel}</Link>}
+              <Link to="/perfil"        className="navbar__drop-item">
+                <IconUser     className="icon icon--sm" /> {t.profile}
+              </Link>
+              <Link to="/configuracoes" className="navbar__drop-item">
+                <IconSettings className="icon icon--sm" /> {t.settings}
+              </Link>
+              {isAdmin && (
+                <Link to="/admin" className="navbar__drop-item">
+                  <IconShield className="icon icon--sm" /> {t.adminPanel}
+                </Link>
+              )}
               <button className="navbar__drop-item navbar__drop-item--red"
                 onClick={() => { logout(); nav('/login'); }}>
                 <IconLogout className="icon icon--sm" /> {t.logout}

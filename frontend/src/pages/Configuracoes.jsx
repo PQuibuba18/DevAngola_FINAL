@@ -4,17 +4,17 @@ import { useLang } from '../context/LanguageContext';
 import api    from '../services/api';
 import Navbar from '../components/Navbar';
 import Button from '../components/ui/Button';
-import { IconSun, IconMoon, IconCheck } from '../components/ui/Icons';
+import { IconSun, IconMoon, IconCheck, IconShield } from '../components/ui/Icons';
 
 export default function Configuracoes() {
-  const { user, updateUser } = useAuth();
-  const { t }               = useLang();
-  const [theme,    setTheme]    = useState(user?.theme    || 'light');
-  const [language, setLanguage] = useState(user?.language || 'pt');
-  const [loading,  setLoading]  = useState(false);
-  const [msg,      setMsg]      = useState('');
+  const { user, updateUser, login } = useAuth();
+  const { t }                       = useLang();
+  const [theme,      setTheme]      = useState(user?.theme    || 'light');
+  const [language,   setLanguage]   = useState(user?.language || 'pt');
+  const [loading,    setLoading]    = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [msg,        setMsg]        = useState('');
 
-  // Aplica o tema imediatamente ao clicar (preview antes de guardar)
   function handleTheme(val) {
     setTheme(val);
     document.documentElement.setAttribute('data-theme', val);
@@ -25,12 +25,26 @@ export default function Configuracoes() {
     try {
       await api.put('/users/preferences', { theme, language });
       updateUser({ theme, language });
-      // Usa o dicionário da linguagem escolhida para a mensagem de sucesso
-      const { DICT } = await import('../context/LanguageContext');
-      setMsg(DICT[language]?.prefsSaved || t.prefsSaved);
-    } catch {
-      setMsg(t.prefsError);
-    } finally { setLoading(false); }
+      setMsg('Preferências guardadas!');
+    } catch { setMsg('Erro ao guardar.'); }
+    finally { setLoading(false); }
+  }
+
+  // Regenera o token com o role actual do banco
+  // Necessário após ser promovido a admin no Neon
+  async function refreshSession() {
+    setRefreshing(true); setMsg('');
+    try {
+      const r = await api.post('/auth/refresh');
+      // login() sobrescreve o token e dados no storage
+      login(r.data.user, r.data.token);
+      if (r.data.user.role === 'admin') {
+        setMsg('✅ Sessão actualizada — és admin! O link Admin aparece na navbar.');
+      } else {
+        setMsg('✅ Sessão actualizada.');
+      }
+    } catch { setMsg('Erro ao actualizar sessão.'); }
+    finally { setRefreshing(false); }
   }
 
   return (
@@ -38,18 +52,18 @@ export default function Configuracoes() {
       <Navbar />
       <div className="page-body"><div className="page-inner"><div className="settings-wrap">
         <div className="settings-card card">
-          <h1 className="settings-title">{t.settingsTitle}</h1>
+          <h1 className="settings-title">{t.settingsTitle || 'Configurações'}</h1>
 
-          {/* ── Tema ── */}
+          {/* Tema */}
           <div className="settings-section">
             <div className="settings-section__header">
-              <h2 className="settings-section__title">{t.themeTitle}</h2>
-              <p className="settings-section__desc">{t.themeDesc}</p>
+              <h2 className="settings-section__title">{t.themeTitle || 'Tema'}</h2>
+              <p className="settings-section__desc">{t.themeDesc || 'Escolhe o aspecto visual da aplicação.'}</p>
             </div>
             <div className="theme-options">
               {[
-                { val:'light', label:t.lightTheme, Icon:IconSun  },
-                { val:'dark',  label:t.darkTheme,  Icon:IconMoon },
+                { val:'light', label: t.lightTheme || 'Claro', Icon:IconSun  },
+                { val:'dark',  label: t.darkTheme  || 'Escuro', Icon:IconMoon },
               ].map(({ val, label, Icon }) => (
                 <button key={val}
                   className={`theme-opt ${theme===val ? 'theme-opt--active' : ''}`}
@@ -70,11 +84,11 @@ export default function Configuracoes() {
 
           <div className="settings-divider" />
 
-          {/* ── Idioma ── */}
+          {/* Idioma */}
           <div className="settings-section">
             <div className="settings-section__header">
-              <h2 className="settings-section__title">{t.langTitle}</h2>
-              <p className="settings-section__desc">{t.langDesc}</p>
+              <h2 className="settings-section__title">{t.langTitle || 'Idioma'}</h2>
+              <p className="settings-section__desc">{t.langDesc || 'Idioma da interface.'}</p>
             </div>
             <div className="lang-options">
               {[
@@ -92,11 +106,33 @@ export default function Configuracoes() {
             </div>
           </div>
 
-          {msg && <div className={`settings-msg ${msg.includes('Erro')||msg.includes('Error') ? 'settings-msg--error' : ''}`}>{msg}</div>}
+          <div className="settings-divider" />
+
+          {/* Actualizar sessão — para admins promovidos no Neon */}
+          <div className="settings-section">
+            <div className="settings-section__header">
+              <h2 className="settings-section__title" style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <IconShield className="icon icon--sm" style={{ color:'var(--red)' }} />
+                Actualizar Sessão
+              </h2>
+              <p className="settings-section__desc">
+                Se foste promovido a admin no banco de dados, clica aqui para actualizar a sessão sem fazer logout.
+              </p>
+            </div>
+            <Button variant="secondary" loading={refreshing} onClick={refreshSession} style={{ width:'auto' }}>
+              <IconShield className="icon icon--sm" /> Actualizar sessão
+            </Button>
+          </div>
+
+          {msg && (
+            <div className={`settings-msg ${msg.toLowerCase().includes('erro') ? 'settings-msg--error' : ''}`}>
+              {msg}
+            </div>
+          )}
 
           <div className="settings-footer">
             <Button onClick={save} loading={loading}>
-              <IconCheck className="icon icon--sm" /> {t.savePrefs}
+              <IconCheck className="icon icon--sm" /> {t.savePrefs || 'Guardar preferências'}
             </Button>
           </div>
         </div>

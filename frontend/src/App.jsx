@@ -17,6 +17,7 @@ import Admin from "./pages/Admin";
 import Ranking from "./pages/Ranking";
 import PerfilPublico from "./pages/PerfilPublico";
 import Vagas from "./pages/Vagas";
+import Verificacao from "./pages/Verificacao";
 
 const P = ({ children }) => <PrivateRoute>{children}</PrivateRoute>;
 
@@ -141,6 +142,8 @@ export default function App() {
                 </P>
               }
             />
+            <Route path="/verificacao" element={<P><Verificacao /></P>} />
+            <Route path="/usuarios/:id" element={<P><PerfilPublico /></P>} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </QuizGuard>

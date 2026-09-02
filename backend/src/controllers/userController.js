@@ -1,3 +1,4 @@
+const db = require('../config/db');
 const UserModel = require('../models/userModel');
 const { useCloudinary } = require('../middlewares/upload');
 
@@ -29,7 +30,11 @@ const userController = {
       const user = await UserModel.findById(req.params.id);
       if (!user) return res.status(404).json({ error: 'Utilizador não encontrado.' });
       const counts = await UserModel.getFollowCounts(req.params.id);
-      return res.json({ ...user, ...counts });
+      return res.json({
+        ...user,
+        followers_count: counts.followers || 0,
+        following_count: counts.following || 0,
+      });
     } catch (err) {
       console.error('userController.getOne:', err.message);
       return res.status(500).json({ error: 'Erro interno.' });
@@ -125,6 +130,38 @@ const userController = {
       return res.status(500).json({ error: 'Erro interno.' });
     }
   },
+
+  // PUT /api/users/me — edita nome, email e identificador
+  async updateMe(req, res) {
+    try {
+      const { name, email, identifier } = req.body;
+      if (!name || !name.trim())   return res.status(400).json({ error: 'Nome obrigatório.' });
+      if (!email || !email.trim()) return res.status(400).json({ error: 'Email obrigatório.' });
+
+      // Verifica se o email já está em uso por outro utilizador
+      const existing = await UserModel.findByEmail(email.trim());
+      if (existing && existing.id !== req.userId) {
+        return res.status(409).json({ error: 'Este email já está a ser usado por outra conta.' });
+      }
+
+      const r = await db.query(
+        `UPDATE users
+         SET name=$1, email=$2, identifier=$3
+         WHERE id=$4
+         RETURNING id, name, email, level, nationality, avatar_url,
+                   badge, badge_label, identifier, role, theme, language,
+                   verified, created_at`,
+        [name.trim(), email.trim().toLowerCase(), identifier?.trim() || null, req.userId]
+      );
+
+      if (!r.rows[0]) return res.status(404).json({ error: 'Utilizador não encontrado.' });
+      return res.json(r.rows[0]);
+    } catch (err) {
+      console.error('userController.updateMe:', err.message);
+      return res.status(500).json({ error: 'Erro interno.' });
+    }
+  },
+
 };
 
 module.exports = userController;

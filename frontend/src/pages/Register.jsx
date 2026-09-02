@@ -50,7 +50,12 @@ export default function Register() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       login(r.data.user, r.data.token);
-      navigate('/feed');
+      // Vai para verificação de identidade se não verificado
+      if (r.data.user.verified) {
+        navigate('/feed');
+      } else {
+        navigate('/verificacao');
+      }
     } catch (err) {
       setError(err.response?.data?.error || 'Erro ao criar conta.');
     } finally {

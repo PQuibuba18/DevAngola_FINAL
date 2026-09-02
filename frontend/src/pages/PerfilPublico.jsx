@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link }     from 'react-router-dom';
-import { useAuth }  from '../context/AuthContext';
-import { useLang }  from '../context/LanguageContext';
-import api     from '../services/api';
-import Navbar  from '../components/Navbar';
-import Avatar  from '../components/ui/Avatar';
-import Badge   from '../components/ui/Badge';
-import Button  from '../components/ui/Button';
-import {
-  IconArrowLeft, IconMessage, IconHome, IconAward,
-  IconHeart, IconComment, IconUserPlus, IconUserCheck,
-} from '../components/ui/Icons';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LanguageContext';
+import api    from '../services/api';
+import Navbar from '../components/Navbar';
+import Avatar from '../components/ui/Avatar';
+import Badge  from '../components/ui/Badge';
+import Button from '../components/ui/Button';
+import PostCard from '../components/PostCard';
+import { IconArrowLeft, IconMessage } from '../components/ui/Icons';
 
 function fmtDate(d, locale) {
   if (!d) return '';
@@ -24,36 +22,34 @@ export default function PerfilPublico() {
   const { lang }     = useLang();
   const locale       = lang === 'en' ? 'en-GB' : 'pt-AO';
 
-  const [profile,   setProfile]   = useState(null);
-  const [posts,     setPosts]     = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState(false);
-  const [starting,  setStarting]  = useState(false);
+  const [profile,  setProfile]  = useState(null);
+  const [posts,    setPosts]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState('');
   const [following, setFollowing] = useState(false);
-  const [followers, setFollowers] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
   const [toggling,  setToggling]  = useState(false);
+  const [starting,  setStarting]  = useState(false);
 
   const isOwnProfile = me && String(me.id) === String(id);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(false);
-    Promise.all([
-      api.get(`/users/${id}`),
-      api.get(`/posts?userId=${id}`),
-      me && !isOwnProfile ? api.get(`/users/${id}/follow-status`) : Promise.resolve(null),
-    ])
-      .then(([u, p, fs]) => {
-        setProfile(u.data);
-        setFollowers(u.data.followers || 0);
-        setFollowingCount(u.data.following || 0);
-        setPosts((p.data || []).filter(post => String(post.user_id) === String(id)));
-        if (fs) setFollowing(fs.data.following);
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [id, me, isOwnProfile]);
+  const load = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      // Carrega perfil e posts em paralelo
+      const [u, p] = await Promise.all([
+        api.get(`/users/${id}`),
+        api.get(`/posts?userId=${id}&limit=20`),
+      ]);
+      setProfile(u.data);
+      // Suporta resposta paginada { posts: [] } e array directo []
+      const postList = Array.isArray(p.data) ? p.data : (p.data.posts ?? []);
+      setPosts(postList);
+    } catch {
+      setError(lang === 'en' ? 'User not found.' : 'Utilizador não encontrado.');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, lang]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -69,36 +65,33 @@ export default function PerfilPublico() {
     if (!me || isOwnProfile || toggling) return;
     setToggling(true);
     try {
-      const r = following
-        ? await api.delete(`/users/${id}/follow`)
-        : await api.post(`/users/${id}/follow`);
-      setFollowing(r.data.following);
-      setFollowers(r.data.followers);
-    } catch {}
-    finally { setToggling(false); }
+      await api.post(`/users/${id}/follow`);
+      setFollowing(f => !f);
+      setProfile(p => p ? {
+        ...p,
+        followers_count: following
+          ? (p.followers_count || 1) - 1
+          : (p.followers_count || 0) + 1,
+      } : p);
+    } catch {} finally { setToggling(false); }
   }
 
   if (loading) return (
-    <div className="page">
-      <Navbar />
-      <div className="page-body" style={{ display:'flex', justifyContent:'center', paddingTop:'4rem' }}>
+    <div className="page"><Navbar />
+      <div className="page-body"><div className="page-inner">
         <div className="spinner" />
-      </div>
+      </div></div>
     </div>
   );
 
   if (error || !profile) return (
-    <div className="page">
-      <Navbar />
+    <div className="page"><Navbar />
       <div className="page-body"><div className="page-inner">
-        <div className="pubprofile-wrap">
-          <button className="newpost-back" onClick={() => navigate(-1)}>
-            <IconArrowLeft className="icon icon--sm" />
-            {lang === 'en' ? 'Back' : 'Voltar'}
-          </button>
-          <div className="card" style={{ padding:'3rem', textAlign:'center', color:'var(--ink-400)' }}>
-            <p>{lang === 'en' ? 'User not found.' : 'Utilizador nao encontrado.'}</p>
-          </div>
+        <div className="card card--padded" style={{ textAlign:'center', marginTop: 40 }}>
+          <p style={{ color:'var(--ink-400)', marginBottom: 16 }}>{error || 'Utilizador não encontrado.'}</p>
+          <Button variant="secondary" onClick={() => navigate(-1)} style={{ width:'auto' }}>
+            ← Voltar
+          </Button>
         </div>
       </div></div>
     </div>
@@ -108,149 +101,84 @@ export default function PerfilPublico() {
     <div className="page">
       <Navbar />
       <div className="page-body"><div className="page-inner">
-        <div className="pubprofile-wrap">
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
+          {/* Botão voltar */}
           <button className="newpost-back" onClick={() => navigate(-1)}>
             <IconArrowLeft className="icon icon--sm" />
             {lang === 'en' ? 'Back' : 'Voltar'}
           </button>
 
-          <div className="pubprofile-card card">
-            <div className="pubprofile-cover" />
+          {/* Card do perfil */}
+          <div className="card" style={{ padding:'var(--s8)', marginBottom:'var(--s4)', textAlign:'center' }}>
+            <Avatar name={profile.name} src={profile.avatar_url} size="2xl" />
+            <h1 style={{ fontFamily:'var(--display)', fontSize:'var(--t-xl)', fontWeight:'var(--w-black)', margin:'var(--s4) 0 var(--s2)' }}>
+              {profile.name}
+              {profile.verified && (
+                <span style={{ fontSize:'var(--t-sm)', color:'#1E5631', marginLeft: 8 }}>✓</span>
+              )}
+            </h1>
+            {profile.badge && (
+              <span className={`seal seal--${profile.badge}`} style={{ marginBottom:'var(--s2)', display:'inline-block' }}>
+                {profile.badge_label}
+              </span>
+            )}
+            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s2)', marginBottom:'var(--s2)' }}>
+              <Badge level={profile.level} />
+            </div>
+            {profile.identifier && (
+              <p style={{ color:'var(--ink-400)', fontSize:'var(--t-sm)', marginBottom:'var(--s4)' }}>
+                {profile.identifier}
+              </p>
+            )}
 
-            <div className="pubprofile-body">
-              <div className="pubprofile-identity">
-                <div className="pubprofile-avatar-wrap">
-                  <Avatar name={profile.name} src={profile.avatar_url} size="2xl" />
-                  {profile.role === 'admin' && (
-                    <span className="admin-pill" style={{ position:'absolute', bottom:0, right:-4 }}>
-                      <IconAward className="icon" style={{ width:9, height:9 }} /> Admin
-                    </span>
-                  )}
+            {/* Stats */}
+            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s8)', marginBottom:'var(--s6)', borderTop:'var(--line)', borderBottom:'var(--line)', padding:'var(--s4) 0' }}>
+              {[
+                { label: lang==='en'?'Posts':'Posts',             value: posts.length },
+                { label: lang==='en'?'Followers':'Seguidores',    value: profile.followers_count || 0 },
+                { label: lang==='en'?'Following':'A seguir',      value: profile.following_count || 0 },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign:'center' }}>
+                  <div style={{ fontFamily:'var(--display)', fontSize:'var(--t-xl)', fontWeight:'var(--w-black)', color:'var(--ink-900)' }}>{s.value}</div>
+                  <div style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)', fontWeight:'var(--w-bold)', textTransform:'uppercase', letterSpacing:'.06em' }}>{s.label}</div>
                 </div>
-                <div className="pubprofile-names">
-                  <h1 className="pubprofile-name">{profile.name}</h1>
-                  <div className="pubprofile-meta">
-                    <Badge level={profile.level} lang={lang} />
-                    {profile.badge && (
-                      <span className={`seal seal--${profile.badge}`}>{profile.badge_label}</span>
-                    )}
-                    {profile.identifier && (
-                      <span className="pubprofile-identifier">{profile.identifier}</span>
-                    )}
-                  </div>
-                  {profile.nationality && (
-                    <p className="pubprofile-nationality">{profile.nationality}</p>
-                  )}
-                </div>
-              </div>
+              ))}
+            </div>
 
-              <div className="pubprofile-actions">
-                {!isOwnProfile && me && (
-                  <Button
-                    variant={following ? 'secondary' : 'primary'}
-                    size="sm"
-                    onClick={toggleFollow}
-                    loading={toggling}
-                  >
+            {/* Acções */}
+            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s3)' }}>
+              {isOwnProfile ? (
+                <Button as={Link} to="/perfil" variant="secondary" style={{ width:'auto' }}>
+                  {lang==='en' ? 'Edit profile' : 'Editar perfil'}
+                </Button>
+              ) : me && (
+                <>
+                  <Button onClick={toggleFollow} loading={toggling} style={{ width:'auto' }}
+                    variant={following ? 'secondary' : 'primary'}>
                     {following
-                      ? <><IconUserCheck className="icon icon--sm" /> {lang === 'en' ? 'Following' : 'A seguir'}</>
-                      : <><IconUserPlus  className="icon icon--sm" /> {lang === 'en' ? 'Follow' : 'Seguir'}</>
-                    }
+                      ? (lang==='en' ? 'Unfollow' : 'Deixar de seguir')
+                      : (lang==='en' ? 'Follow' : 'Seguir')}
                   </Button>
-                )}
-                {!isOwnProfile && me && (
-                  <Button variant="ghost" size="sm" onClick={startChat} loading={starting}>
-                    <IconMessage className="icon icon--sm" />
-                    {lang === 'en' ? 'Message' : 'Mensagem'}
+                  <Button variant="secondary" onClick={startChat} loading={starting} style={{ width:'auto' }}>
+                    <IconMessage className="icon icon--sm" /> {lang==='en'?'Message':'Mensagem'}
                   </Button>
-                )}
-                {isOwnProfile && (
-                  <Button as={Link} to="/perfil" variant="secondary" size="sm">
-                    {lang === 'en' ? 'Edit profile' : 'Editar perfil'}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="pubprofile-stats">
-              <div className="pubprofile-stat">
-                <IconHome className="icon icon--sm" style={{ color:'var(--ink-400)' }} />
-                <strong>{posts.length}</strong>
-                <span>{lang === 'en' ? 'posts' : 'posts'}</span>
-              </div>
-              <div className="pubprofile-stat">
-                <IconHeart className="icon icon--sm" style={{ color:'var(--red)' }} />
-                <strong>{posts.reduce((acc, p) => acc + (p.likes_count || 0), 0)}</strong>
-                <span>{lang === 'en' ? 'likes' : 'gostos'}</span>
-              </div>
-              <div className="pubprofile-stat">
-                <IconComment className="icon icon--sm" style={{ color:'var(--ink-400)' }} />
-                <strong>{posts.reduce((acc, p) => acc + (p.comments_count || 0), 0)}</strong>
-                <span>{lang === 'en' ? 'comments' : 'comentarios'}</span>
-              </div>
-              <div className="pubprofile-stat pubprofile-stat--follow">
-                <strong>{followers}</strong>
-                <span>{lang === 'en' ? 'followers' : 'seguidores'}</span>
-              </div>
-              <div className="pubprofile-stat pubprofile-stat--follow">
-                <strong>{followingCount}</strong>
-                <span>{lang === 'en' ? 'following' : 'a seguir'}</span>
-              </div>
-              <div className="pubprofile-stat pubprofile-stat--date">
-                <span className="pubprofile-stat__label">
-                  {lang === 'en' ? 'Member since' : 'Membro desde'}
-                </span>
-                <strong>{fmtDate(profile.created_at, locale)}</strong>
-              </div>
+                </>
+              )}
             </div>
           </div>
 
-          <h2 className="pubprofile-posts-title">
-            Posts <span>({posts.length})</span>
+          {/* Posts do utilizador */}
+          <h2 style={{ fontSize:'var(--t-md)', fontWeight:'var(--w-black)', color:'var(--ink-900)', marginBottom:'var(--s4)' }}>
+            Posts ({posts.length})
           </h2>
-
-          {posts.length === 0 && (
-            <div className="card" style={{ padding:'2.5rem', textAlign:'center', color:'var(--ink-400)', fontStyle:'italic' }}>
-              {lang === 'en' ? 'No posts yet.' : 'Ainda nao ha posts.'}
+          {posts.length === 0 ? (
+            <div className="card card--padded" style={{ textAlign:'center', color:'var(--ink-400)' }}>
+              {lang==='en' ? 'No posts yet.' : 'Sem posts ainda.'}
             </div>
+          ) : (
+            posts.map(p => <PostCard key={p.id} post={p} />)
           )}
-
-          <div className="pubprofile-posts">
-            {posts.map(post => (
-              <Link key={post.id} to={`/posts/${post.id}`} className="pubprofile-post card">
-                {post.image_url && (
-                  <img
-                    src={post.image_url.startsWith('http')
-                      ? post.image_url
-                      : `${(process.env.REACT_APP_API_URL || '').replace('/api','')}${post.image_url}`}
-                    alt={post.title}
-                    className="pubprofile-post__img"
-                  />
-                )}
-                <div className="pubprofile-post__body">
-                  <h3 className="pubprofile-post__title">{post.title}</h3>
-                  <p className="pubprofile-post__excerpt">
-                    {post.content?.slice(0, 120)}{post.content?.length > 120 ? '...' : ''}
-                  </p>
-                  <div className="pubprofile-post__foot">
-                    <span className="pubprofile-post__stat">
-                      <IconHeart className="icon icon--sm" style={{ color:'var(--red)' }} />
-                      {post.likes_count || 0}
-                    </span>
-                    <span className="pubprofile-post__stat">
-                      <IconComment className="icon icon--sm" />
-                      {post.comments_count || 0}
-                    </span>
-                    <span className="pubprofile-post__date">
-                      {new Date(post.created_at).toLocaleDateString(locale)}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
         </div>
       </div></div>
     </div>
