@@ -9,6 +9,7 @@ import Badge  from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import PostCard from '../components/PostCard';
 import { IconArrowLeft, IconMessage } from '../components/ui/Icons';
+import VerifiedBadge from '../components/ui/VerifiedBadge';
 
 function fmtDate(d, locale) {
   if (!d) return '';
