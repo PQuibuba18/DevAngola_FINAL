@@ -18,6 +18,13 @@ import Ranking from "./pages/Ranking";
 import PerfilPublico from "./pages/PerfilPublico";
 import Vagas from "./pages/Vagas";
 import Verificacao from "./pages/Verificacao";
+import Passport    from "./pages/Passport";
+import Desafios     from "./pages/Desafios";
+import WorkExchange from "./pages/WorkExchange";
+import TechStack    from "./pages/TechStack";
+import Eventos      from "./pages/Eventos";
+import Startups     from "./pages/Startups";
+import OpenSource   from "./pages/OpenSource";
 
 const P = ({ children }) => <PrivateRoute>{children}</PrivateRoute>;
 
@@ -142,6 +149,13 @@ export default function App() {
                 </P>
               }
             />
+            <Route path="/desafios" element={<P><Desafios /></P>} />
+            <Route path="/work" element={<P><WorkExchange /></P>} />
+            <Route path="/questions" element={<P><TechStack /></P>} />
+            <Route path="/eventos" element={<P><Eventos /></P>} />
+            <Route path="/startups" element={<P><Startups /></P>} />
+            <Route path="/open-source" element={<P><OpenSource /></P>} />
+            <Route path="/passport/:userId" element={<P><Passport /></P>} />
             <Route path="/verificacao" element={<P><Verificacao /></P>} />
             <Route path="/usuarios/:id" element={<P><PerfilPublico /></P>} />
             <Route path="*" element={<Navigate to="/feed" replace />} />

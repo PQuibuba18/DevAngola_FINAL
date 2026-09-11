@@ -57,6 +57,14 @@ app.use('/api/projects',      require('../backend/src/routes/projectRoutes'));
 app.use('/api/mentors',       require('../backend/src/routes/mentorRoutes'));
 app.use('/api/verification',  require('../backend/src/routes/verificationRoutes'));
 
+app.use('/api/challenges',   require('../backend/src/routes/proofLabRoutes'));
+app.use('/api/work',         require('../backend/src/routes/workExchangeRoutes'));
+app.use('/api/questions',    require('../backend/src/routes/techStackRoutes'));
+app.use('/api/events',       require('../backend/src/routes/eventsRoutes'));
+app.use('/api/startups',     require('../backend/src/routes/startupsRoutes'));
+app.use('/api/open-source',  require('../backend/src/routes/openSourceRoutes'));
+app.use('/api/passport', require('../backend/src/routes/passportRoutes'));
+
 app.get('/api/health', (_, res) =>
   res.json({ status: 'OK', timestamp: new Date(), version: '1.0.0' })
 );

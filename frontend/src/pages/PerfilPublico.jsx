@@ -149,6 +149,9 @@ export default function PerfilPublico() {
 
             {/* Acções */}
             <div style={{ display:'flex', justifyContent:'center', gap:'var(--s3)' }}>
+              <Button as={Link} to={`/passport/${profile.id}`} style={{ width:'auto' }}>
+                Passport Profissional
+              </Button>
               {isOwnProfile ? (
                 <Button as={Link} to="/perfil" variant="secondary" style={{ width:'auto' }}>
                   {lang==='en' ? 'Edit profile' : 'Editar perfil'}

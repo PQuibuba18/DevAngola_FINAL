@@ -110,6 +110,14 @@ app.use('/api/projects',      require('./routes/projectRoutes'));
 app.use('/api/mentors',       require('./routes/mentorRoutes'));
 app.use('/api/verification',  require('./routes/verificationRoutes'));
 
+app.use('/api/challenges',   require('./routes/proofLabRoutes'));
+app.use('/api/work',         require('./routes/workExchangeRoutes'));
+app.use('/api/questions',    require('./routes/techStackRoutes'));
+app.use('/api/events',       require('./routes/eventsRoutes'));
+app.use('/api/startups',     require('./routes/startupsRoutes'));
+app.use('/api/open-source',  require('./routes/openSourceRoutes'));
+app.use('/api/passport', require('./routes/passportRoutes'));
+
 app.get('/api/health', (_, res) =>
   res.json({ status: 'OK', timestamp: new Date(), version: '1.0.0' })
 );
