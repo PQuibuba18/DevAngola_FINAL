@@ -7,7 +7,6 @@ import Avatar       from '../components/ui/Avatar';
 import Badge        from '../components/ui/Badge';
 import Button       from '../components/ui/Button';
 import VerifiedBadge from '../components/ui/VerifiedBadge';
-import { IconCamera, IconCheck, IconEdit } from '../components/ui/Icons';
 
 export default function Perfil() {
   const { user, updateUser } = useAuth();
@@ -29,15 +28,15 @@ export default function Perfil() {
     const f = e.target.files[0];
     if (!f) return;
     setAvatarFile(f);
-    const r = new FileReader();
-    r.onload = ev => setPreview(ev.target.result);
-    r.readAsDataURL(f);
+    const reader = new FileReader();
+    reader.onload = ev => setPreview(ev.target.result);
+    reader.readAsDataURL(f);
   }
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!form.name.trim())  { setError(lang === 'en' ? 'Name required.' : 'Nome obrigatório.');  return; }
-    if (!form.email.trim()) { setError(lang === 'en' ? 'Email required.' : 'Email obrigatório.'); return; }
+    if (!form.name.trim())  { setError(lang==='en' ? 'Name required.' : 'Nome obrigatório.');  return; }
+    if (!form.email.trim()) { setError(lang==='en' ? 'Email required.' : 'Email obrigatório.'); return; }
 
     setSaving(true); setMsg(''); setError('');
     try {
@@ -57,12 +56,12 @@ export default function Perfil() {
         updateUser({ avatar_url: av.data.avatar_url });
       }
 
-      setMsg(lang === 'en' ? 'Profile updated!' : 'Perfil actualizado com sucesso!');
+      setMsg(lang==='en' ? 'Profile updated!' : 'Perfil actualizado!');
       setEditing(false);
       setAvatarFile(null);
       setPreview(null);
     } catch (err) {
-      setError(err.response?.data?.error || (lang === 'en' ? 'Error saving.' : 'Erro ao guardar.'));
+      setError(err.response?.data?.error || (lang==='en' ? 'Error saving.' : 'Erro ao guardar.'));
     } finally {
       setSaving(false);
     }
@@ -71,106 +70,81 @@ export default function Perfil() {
   function fmtDate(d) {
     if (!d) return '—';
     return new Date(d).toLocaleDateString(
-      lang === 'en' ? 'en-GB' : 'pt-AO',
-      { month: 'long', year: 'numeric' }
+      lang==='en' ? 'en-GB' : 'pt-AO',
+      { month:'long', year:'numeric' }
     );
   }
 
-  const API = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
+  const API       = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api','');
   const avatarSrc = preview
     || (user?.avatar_url
       ? (user.avatar_url.startsWith('http') ? user.avatar_url : `${API}${user.avatar_url}`)
       : null);
 
   const FIELDS = [
-    { key: 'name',       label: lang === 'en' ? 'Full Name' : 'Nome Completo',              type: 'text',  placeholder: lang === 'en' ? 'Your name' : 'O teu nome' },
-    { key: 'email',      label: 'E-mail',                                                    type: 'email', placeholder: 'email@exemplo.com' },
-    { key: 'identifier', label: lang === 'en' ? 'Identifier (optional)' : 'Identificador (opcional)', type: 'text',  placeholder: lang === 'en' ? 'Ex: React Developer' : 'Ex: Programador React' },
+    { key:'name',       label: lang==='en' ? 'Full Name'              : 'Nome Completo',              type:'text',  placeholder: lang==='en' ? 'Your name' : 'O teu nome' },
+    { key:'email',      label: 'E-mail',                                                               type:'email', placeholder: 'email@exemplo.com' },
+    { key:'identifier', label: lang==='en' ? 'Identifier (optional)'  : 'Identificador (opcional)',   type:'text',  placeholder: lang==='en' ? 'Ex: React Developer' : 'Ex: Programador React' },
   ];
 
   const INFO_ROWS = [
-    { label: lang === 'en' ? 'Name'         : 'Nome',         value: user?.name },
+    { label: lang==='en' ? 'Name'         : 'Nome',           value: user?.name },
     { label: 'E-mail',                                          value: user?.email },
-    { label: lang === 'en' ? 'Level'        : 'Nível',        value: <Badge level={user?.level} /> },
-    { label: lang === 'en' ? 'Identifier'   : 'Identificador', value: user?.identifier || '—' },
-    { label: lang === 'en' ? 'Member since' : 'Membro desde', value: fmtDate(user?.created_at) },
+    { label: lang==='en' ? 'Level'        : 'Nível',          value: <Badge level={user?.level} /> },
+    { label: lang==='en' ? 'Identifier'   : 'Identificador',  value: user?.identifier || '—' },
+    { label: lang==='en' ? 'Member since' : 'Membro desde',   value: fmtDate(user?.created_at) },
   ];
 
   return (
     <div className="page">
       <Navbar />
       <div className="page-body"><div className="page-inner">
-        <div style={{ maxWidth: 560, margin: '0 auto' }}>
-          <div className="card" style={{ padding: 'var(--s8)' }}>
+        <div className="settings-wrap">
+          <div className="card settings-card">
 
-            {/* Avatar + nome + badges */}
-            <div style={{ textAlign: 'center', marginBottom: 'var(--s6)' }}>
-              <div style={{ position: 'relative', display: 'inline-block', marginBottom: 'var(--s3)' }}>
+            {/* Avatar */}
+            <div style={{ textAlign:'center', marginBottom:'var(--s6)' }}>
+              <div style={{ position:'relative', display:'inline-block', marginBottom:'var(--s3)' }}>
                 <Avatar name={user?.name} src={avatarSrc} size="2xl" />
                 <button
                   type="button"
                   onClick={() => document.getElementById('av-input').click()}
                   style={{
-                    position: 'absolute', bottom: 0, right: 0,
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: 'var(--ink-900)', border: '2px solid var(--surface)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer',
+                    position:'absolute', bottom:0, right:0,
+                    width:32, height:32, borderRadius:'50%',
+                    background:'var(--ink-900)', border:'2px solid var(--surface)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    cursor:'pointer',
                   }}
                 >
-                  <IconCamera className="icon icon--sm" style={{ color: 'white' }} />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="white" strokeWidth="2" strokeLinecap="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
                 </button>
               </div>
               <input id="av-input" type="file" accept="image/*"
-                onChange={handleAvatarChange} style={{ display: 'none' }} />
+                onChange={handleAvatarChange} style={{ display:'none' }} />
 
-              <div style={{
-                fontFamily: 'var(--display)', fontSize: 'var(--t-xl)',
-                fontWeight: 'var(--w-black)', color: 'var(--ink-900)',
-                marginBottom: 'var(--s2)',
-              }}>
-                {user?.name}
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--s2)', flexWrap: 'wrap' }}>
-                <Badge level={user?.level} />
-                {user?.badge && (
-                  <span className={`seal seal--${user.badge}`}>{user.badge_label}</span>
+              <div>
+                <div className="heading-lg" style={{ marginBottom:'var(--s2)' }}>{user?.name}</div>
+                <div className="row--wrap" style={{ justifyContent:'center' }}>
+                  <Badge level={user?.level} />
+                  {user?.badge && <span className={`seal seal--${user.badge}`}>{user.badge_label}</span>}
+                  {user?.verified && <VerifiedBadge lang={lang} />}
+                </div>
+                {user?.identifier && (
+                  <p className="body-sm" style={{ marginTop:'var(--s2)' }}>{user.identifier}</p>
                 )}
-                {/* Selo de verificado — visível apenas se verificado */}
-                {user?.verified && <VerifiedBadge lang={lang} />}
               </div>
-
-              {user?.identifier && (
-                <p style={{ fontSize: 'var(--t-sm)', color: 'var(--ink-400)', marginTop: 'var(--s2)' }}>
-                  {user.identifier}
-                </p>
-              )}
             </div>
 
-            {/* Mensagens de feedback */}
-            {msg && (
-              <div style={{
-                background: '#E6F4EA', color: '#1A5C30',
-                padding: '10px 14px', borderRadius: 8,
-                fontSize: 13, fontWeight: 600, marginBottom: 16,
-              }}>
-                {msg}
-              </div>
-            )}
-            {error && (
-              <div style={{
-                background: 'var(--red-soft)', color: 'var(--red)',
-                padding: '10px 14px', borderRadius: 8,
-                fontSize: 13, fontWeight: 600, marginBottom: 16,
-              }}>
-                {error}
-              </div>
-            )}
+            {msg   && <div className="feedback feedback--success">{msg}</div>}
+            {error && <div className="feedback feedback--error">{error}</div>}
 
-            {/* Formulário de edição */}
             {editing ? (
-              <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s4)' }}>
+              <form onSubmit={handleSave} className="stack">
                 {FIELDS.map(field => (
                   <div key={field.key} className="field">
                     <label className="field__label">{field.label}</label>
@@ -178,81 +152,55 @@ export default function Perfil() {
                       className="input"
                       type={field.type}
                       value={form[field.key]}
-                      onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                      onChange={e => setForm(f => ({...f, [field.key]: e.target.value}))}
                       placeholder={field.placeholder}
                     />
                   </div>
                 ))}
-                <div style={{ display: 'flex', gap: 'var(--s3)', justifyContent: 'flex-end' }}>
-                  <Button
-                    type="button" variant="secondary" style={{ width: 'auto' }}
+                <div className="row" style={{ justifyContent:'flex-end' }}>
+                  <Button type="button" variant="secondary" style={{ width:'auto' }}
                     onClick={() => {
                       setEditing(false);
-                      setForm({ name: user?.name || '', email: user?.email || '', identifier: user?.identifier || '' });
+                      setForm({ name: user?.name||'', email: user?.email||'', identifier: user?.identifier||'' });
                       setPreview(null); setAvatarFile(null); setError('');
-                    }}
-                  >
-                    {lang === 'en' ? 'Cancel' : 'Cancelar'}
+                    }}>
+                    {lang==='en' ? 'Cancel' : 'Cancelar'}
                   </Button>
-                  <Button type="submit" loading={saving} style={{ width: 'auto' }}>
-                    <IconCheck className="icon icon--sm" /> {lang === 'en' ? 'Save' : 'Guardar'}
+                  <Button type="submit" loading={saving} style={{ width:'auto' }}>
+                    {lang==='en' ? 'Save' : 'Guardar'}
                   </Button>
                 </div>
               </form>
             ) : (
               <>
-                {/* Informações */}
                 <div>
                   {INFO_ROWS.map(row => (
-                    <div key={row.label} style={{
-                      display: 'flex', justifyContent: 'space-between',
-                      alignItems: 'center', padding: 'var(--s3) 0',
-                      borderBottom: 'var(--line)',
-                    }}>
-                      <span style={{ fontSize: 'var(--t-sm)', color: 'var(--ink-400)', fontWeight: 'var(--w-bold)' }}>
-                        {row.label}
-                      </span>
-                      <span style={{
-                        fontSize: 'var(--t-sm)', color: 'var(--ink-900)',
-                        fontWeight: 'var(--w-medium)', textAlign: 'right', maxWidth: '60%',
-                      }}>
-                        {row.value}
-                      </span>
+                    <div key={row.label} className="info-row">
+                      <span className="info-row__label">{row.label}</span>
+                      <span className="info-row__value">{row.value}</span>
                     </div>
                   ))}
-
-                  {/* Linha de identidade */}
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', padding: 'var(--s3) 0',
-                  }}>
-                    <span style={{ fontSize: 'var(--t-sm)', color: 'var(--ink-400)', fontWeight: 'var(--w-bold)' }}>
-                      {lang === 'en' ? 'Identity' : 'Identidade'}
-                    </span>
-                    <span>
+                  <div className="info-row">
+                    <span className="info-row__label">{lang==='en' ? 'Identity' : 'Identidade'}</span>
+                    <span className="info-row__value">
                       {user?.verified
                         ? <VerifiedBadge size="sm" lang={lang} />
-                        : (
-                          <span style={{ fontSize: 'var(--t-sm)', color: 'var(--ink-400)', fontStyle: 'italic' }}>
-                            {lang === 'en' ? 'Not verified' : 'Não verificada'}
+                        : <span className="caption" style={{ fontStyle:'italic' }}>
+                            {lang==='en' ? 'Not verified' : 'Não verificada'}
                           </span>
-                        )
                       }
                     </span>
                   </div>
                 </div>
 
-                {/* Acções */}
-                <div style={{ display: 'flex', gap: 'var(--s3)', marginTop: 'var(--s6)', flexWrap: 'wrap' }}>
-                  <Button style={{ width: 'auto' }} onClick={() => setEditing(true)}>
-                    <IconEdit className="icon icon--sm" /> {lang === 'en' ? 'Edit profile' : 'Editar perfil'}
+                <div className="row--wrap" style={{ marginTop:'var(--s6)' }}>
+                  <Button style={{ width:'auto' }} onClick={() => setEditing(true)}>
+                    {lang==='en' ? 'Edit profile' : 'Editar perfil'}
                   </Button>
                   {!user?.verified && (
-                    <Button
-                      variant="secondary" style={{ width: 'auto' }}
-                      onClick={() => { window.location.href = '/verificacao'; }}
-                    >
-                      {lang === 'en' ? 'Verify identity' : 'Verificar identidade'}
+                    <Button variant="secondary" style={{ width:'auto' }}
+                      onClick={() => { window.location.href = '/verificacao'; }}>
+                      {lang==='en' ? 'Verify identity' : 'Verificar identidade'}
                     </Button>
                   )}
                 </div>

@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api    from '../services/api';
 import Navbar from '../components/Navbar';
-import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
+import Button from '../components/ui/Button';
 
 const CATEGORIES = ['meetup','hackathon','conference','workshop','bootcamp','webinar','competition','other'];
 const CAT_LABEL  = { meetup:'Meetup', hackathon:'Hackathon', conference:'Conferência', workshop:'Workshop', bootcamp:'Bootcamp', webinar:'Webinar', competition:'Concurso', other:'Outro' };
@@ -14,25 +14,29 @@ function fmtDate(d) {
 }
 
 export default function Eventos() {
-  const { user } = useAuth();
-  const [events,   setEvents]   = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [filter,   setFilter]   = useState({ category:'', city:'' });
-  const [form, setForm] = useState({
-    title:'', description:'', category:'meetup', location_name:'', city:'Luanda',
-    is_online: false, online_url:'', start_date:'', end_date:'',
-    registration_url:'', max_participants:'', is_free: true, price:'',
-  });
+  const { user }    = useAuth();
+  const [events,    setEvents]   = useState([]);
+  const [loading,   setLoading]  = useState(true);
+  const [showForm,  setShowForm] = useState(false);
+  const [filter,    setFilter]   = useState({ category:'', city:'' });
+  const [registering, setReg]    = useState(null);
   const [saving,    setSaving]   = useState(false);
-  const [registering, setReg]   = useState(null);
   const [msg,       setMsg]      = useState('');
+  const [form, setForm] = useState({
+    title:'', description:'', category:'meetup', location_name:'',
+    city:'Luanda', is_online:false, online_url:'', start_date:'',
+    end_date:'', registration_url:'', max_participants:'', is_free:true, price:'',
+  });
 
   useEffect(() => {
+    setLoading(true);
     const params = { status:'upcoming' };
     if (filter.category) params.category = filter.category;
     if (filter.city)     params.city     = filter.city;
-    api.get('/events', { params }).then(r => setEvents(r.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/events', { params })
+      .then(r => setEvents(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [filter]);
 
   function ch(e) {
@@ -42,15 +46,14 @@ export default function Eventos() {
 
   async function handleCreate(e) {
     e.preventDefault();
-    if (!form.title || !form.description || !form.start_date) { setMsg('Preenche os campos obrigatórios.'); return; }
+    if (!form.title || !form.description || !form.start_date) { flash('Preenche os campos obrigatórios.'); return; }
     setSaving(true);
     try {
       const r = await api.post('/events', { ...form, max_participants: form.max_participants||null, price: form.price||null });
       setEvents(ev => [r.data, ...ev]);
       setShowForm(false);
-      setMsg('Evento criado com sucesso!');
-      setTimeout(() => setMsg(''), 3000);
-    } catch (err) { setMsg(err.response?.data?.error || 'Erro.'); }
+      flash('Evento criado!');
+    } catch (err) { flash(err.response?.data?.error || 'Erro.'); }
     finally { setSaving(false); }
   }
 
@@ -59,33 +62,35 @@ export default function Eventos() {
     try {
       if (ev.is_registered) {
         await api.delete(`/events/${ev.id}/register`);
-        setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, is_registered: false, participants_count: e.participants_count - 1 } : e));
+        setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, is_registered:false, participants_count:e.participants_count-1 } : e));
       } else {
         await api.post(`/events/${ev.id}/register`);
-        setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, is_registered: true, participants_count: e.participants_count + 1 } : e));
+        setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, is_registered:true, participants_count:e.participants_count+1 } : e));
       }
-    } catch (err) { setMsg(err.response?.data?.error || 'Erro.'); }
+    } catch (err) { flash(err.response?.data?.error || 'Erro.'); }
     finally { setReg(null); }
   }
+
+  function flash(m) { setMsg(m); setTimeout(() => setMsg(''), 3000); }
 
   return (
     <div className="page">
       <Navbar />
       <div className="page-body"><div className="page-inner">
-        <div style={{ maxWidth: 860, margin:'0 auto' }}>
+        <div className="page-container">
 
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'var(--s6)', flexWrap:'wrap', gap:12 }}>
-            <div>
-              <h1 style={{ fontFamily:'var(--display)', fontSize:'var(--t-2xl)', fontWeight:'var(--w-black)', letterSpacing:'-.03em', color:'var(--ink-900)', marginBottom:4 }}>Eventos Tech Angola</h1>
-              <p style={{ fontSize:'var(--t-sm)', color:'var(--ink-400)' }}>Meetups, hackathons, workshops e conferências do ecossistema angolano.</p>
+          {msg && <div className="feedback feedback--success" style={{ position:'fixed', top:'calc(var(--nav-h) + 12px)', right:'var(--s5)', zIndex:999 }}>{msg}</div>}
+
+          <div className="page-header">
+            <div className="page-header__text">
+              <h1 className="page-header__title">Eventos Tech Angola</h1>
+              <p className="page-header__sub">Meetups, hackathons, workshops e conferências do ecossistema angolano.</p>
             </div>
             {user && <Button style={{ width:'auto' }} onClick={() => setShowForm(!showForm)}>Criar evento</Button>}
           </div>
 
-          {msg && <div style={{ background:'var(--ink-900)', color:'#fff', padding:'10px 16px', borderRadius:8, fontSize:13, fontWeight:600, marginBottom:16 }}>{msg}</div>}
-
           {/* Filtros */}
-          <div style={{ display:'flex', gap:'var(--s3)', flexWrap:'wrap', marginBottom:'var(--s5)' }}>
+          <div className="row--wrap" style={{ marginBottom:'var(--s5)' }}>
             <select className="select" style={{ width:'auto', minWidth:160 }} value={filter.category} onChange={e => setFilter(f=>({...f,category:e.target.value}))}>
               <option value="">Todas as categorias</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
@@ -96,11 +101,12 @@ export default function Eventos() {
             </select>
           </div>
 
+          {/* Formulário */}
           {showForm && (
-            <div className="card" style={{ padding:'var(--s6)', marginBottom:'var(--s5)', borderLeft:'4px solid var(--red)' }}>
-              <h3 style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', marginBottom:'var(--s5)' }}>Novo Evento</h3>
-              <form onSubmit={handleCreate} style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'var(--s3)' }}>
-                <div className="field" style={{ gridColumn:'1/-1' }}>
+            <div className="card card--accent-left card__body--lg" style={{ borderLeftColor:'var(--red)', marginBottom:'var(--s5)' }}>
+              <h3 className="section-header">Novo Evento</h3>
+              <form onSubmit={handleCreate} className="form-grid">
+                <div className="field field-full">
                   <label className="field__label">Título *</label>
                   <input className="input" name="title" value={form.title} onChange={ch} placeholder="Ex: Meetup React Angola #5" />
                 </div>
@@ -137,17 +143,17 @@ export default function Eventos() {
                   <input className="input" name="registration_url" value={form.registration_url} onChange={ch} placeholder="https://..." />
                 </div>
                 <div className="field">
-                  <label className="field__label">É gratuito?</label>
-                  <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:8, cursor:'pointer' }}>
+                  <label className="field__label">Entrada</label>
+                  <label style={{ display:'flex', alignItems:'center', gap:'var(--s2)', marginTop:'var(--s2)', cursor:'pointer' }}>
                     <input type="checkbox" name="is_free" checked={form.is_free} onChange={ch} />
-                    <span style={{ fontSize:14 }}>Entrada gratuita</span>
+                    <span className="body-sm">Gratuita</span>
                   </label>
                 </div>
-                <div className="field" style={{ gridColumn:'1/-1' }}>
+                <div className="field field-full">
                   <label className="field__label">Descrição *</label>
                   <textarea className="textarea" rows={4} name="description" value={form.description} onChange={ch} placeholder="Descreve o evento, programa, oradores..." />
                 </div>
-                <div style={{ gridColumn:'1/-1', display:'flex', gap:'var(--s3)', justifyContent:'flex-end' }}>
+                <div className="field-actions">
                   <Button type="button" variant="secondary" style={{ width:'auto' }} onClick={() => setShowForm(false)}>Cancelar</Button>
                   <Button type="submit" loading={saving} style={{ width:'auto' }}>Criar evento</Button>
                 </div>
@@ -157,51 +163,53 @@ export default function Eventos() {
 
           {loading && <div className="spinner" />}
 
-          <div style={{ display:'flex', flexDirection:'column', gap:'var(--s3)' }}>
+          <div className="stack--sm">
             {events.map(ev => (
-              <div key={ev.id} className="card" style={{ padding:'var(--s5)' }}>
-                <div style={{ display:'flex', gap:'var(--s4)', alignItems:'flex-start' }}>
-                  <div style={{ width:56, textAlign:'center', flexShrink:0 }}>
-                    <div style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:24, color:'var(--red)', lineHeight:1 }}>
+              <div key={ev.id} className="card card__body--lg">
+                <div className="row" style={{ alignItems:'flex-start', gap:'var(--s5)' }}>
+                  {/* Data */}
+                  <div style={{ textAlign:'center', minWidth:52, flexShrink:0 }}>
+                    <div style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:'var(--t-2xl)', color:'var(--red)', lineHeight:1 }}>
                       {new Date(ev.start_date).getDate()}
                     </div>
-                    <div style={{ fontSize:12, fontWeight:700, color:'var(--ink-400)', textTransform:'uppercase' }}>
+                    <div className="caption" style={{ textTransform:'uppercase', marginTop:2 }}>
                       {new Date(ev.start_date).toLocaleDateString('pt-AO', { month:'short' })}
                     </div>
                   </div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:4 }}>
-                      {ev.is_featured && <span style={{ fontSize:11, fontWeight:700, color:'#C8860A', background:'#FEF7E0', padding:'1px 7px', borderRadius:999 }}>Destaque</span>}
-                      <span style={{ fontSize:11, fontWeight:700, padding:'1px 7px', borderRadius:999, background:'var(--red-soft)', color:'var(--red)' }}>{CAT_LABEL[ev.category]}</span>
-                      <span style={{ fontSize:11, color:'var(--ink-400)' }}>{ev.is_online ? 'Online' : ev.city}</span>
-                      {ev.is_free ? <span style={{ fontSize:11, color:'#1A5C30', fontWeight:700 }}>Gratuito</span> : <span style={{ fontSize:11, color:'var(--ink-400)' }}>Pago</span>}
+
+                  {/* Conteúdo */}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div className="row--wrap" style={{ marginBottom:'var(--s1)' }}>
+                      {ev.is_featured && <span className="tag tag--gold">Destaque</span>}
+                      <span className="tag tag--red">{CAT_LABEL[ev.category]}</span>
+                      <span className="tag tag--neutral">{ev.is_online ? 'Online' : ev.city}</span>
+                      <span className={`tag ${ev.is_free ? 'tag--green' : 'tag--neutral'}`}>{ev.is_free ? 'Gratuito' : 'Pago'}</span>
                     </div>
-                    <h3 style={{ fontWeight:'var(--w-black)', fontSize:'var(--t-base)', color:'var(--ink-900)', marginBottom:4 }}>{ev.title}</h3>
-                    <p style={{ fontSize:'var(--t-sm)', color:'var(--ink-500)', lineHeight:1.5, marginBottom:6 }}>
+                    <h3 className="heading-sm" style={{ marginBottom:'var(--s1)' }}>{ev.title}</h3>
+                    <p className="body-sm" style={{ marginBottom:'var(--s3)' }}>
                       {ev.description?.slice(0,140)}{ev.description?.length>140?'...':''}
                     </p>
-                    <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                        <Avatar name={ev.organizer_name} src={ev.organizer_avatar} size="xs" />
-                        <span style={{ fontSize:12, color:'var(--ink-400)' }}>{ev.organizer_name}</span>
-                      </div>
-                      <span style={{ fontSize:12, color:'var(--ink-400)' }}>{ev.participants_count} inscritos</span>
-                      <span style={{ fontSize:12, color:'var(--ink-400)' }}>{fmtDate(ev.start_date)}</span>
+                    <div className="meta-line">
+                      <Avatar name={ev.organizer_name} src={ev.organizer_avatar} size="xs" />
+                      <span>{ev.organizer_name}</span>
+                      <span>{ev.participants_count} inscritos</span>
+                      <span>{fmtDate(ev.start_date)}</span>
                     </div>
                   </div>
+
+                  {/* Acção */}
                   <div style={{ flexShrink:0 }}>
                     {user ? (
                       <Button
                         loading={registering === ev.id}
                         variant={ev.is_registered ? 'secondary' : 'primary'}
-                        style={{ width:'auto', fontSize:13 }}
-                        onClick={() => toggleRegister(ev)}
-                      >
-                        {ev.is_registered ? 'Inscrito ✓' : 'Inscrever'}
+                        style={{ width:'auto', fontSize:'var(--t-sm)' }}
+                        onClick={() => toggleRegister(ev)}>
+                        {ev.is_registered ? 'Inscrito' : 'Inscrever'}
                       </Button>
                     ) : ev.registration_url ? (
                       <a href={ev.registration_url} target="_blank" rel="noreferrer"
-                        style={{ fontSize:13, fontWeight:700, color:'var(--red)' }}>
+                        className="body-sm" style={{ color:'var(--red)', fontWeight:'var(--w-bold)', textDecoration:'none' }}>
                         Ver evento →
                       </a>
                     ) : null}
@@ -210,11 +218,10 @@ export default function Eventos() {
               </div>
             ))}
             {!loading && events.length === 0 && (
-              <div className="card card--padded" style={{ textAlign:'center', color:'var(--ink-400)' }}>
-                Sem eventos próximos. Cria o primeiro!
-              </div>
+              <div className="card card--padded">Sem eventos próximos. Cria o primeiro!</div>
             )}
           </div>
+
         </div>
       </div></div>
     </div>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute  from "./components/AdminRoute";
 import QuizGuard from "./pages/QuizGuard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -27,6 +28,7 @@ import Startups     from "./pages/Startups";
 import OpenSource   from "./pages/OpenSource";
 
 const P = ({ children }) => <PrivateRoute>{children}</PrivateRoute>;
+const A = ({ children }) => <AdminRoute>{children}</AdminRoute>;
 
 export default function App() {
   return (
@@ -128,9 +130,9 @@ export default function App() {
             <Route
               path="/admin"
               element={
-                <P>
+                <A>
                   <Admin />
-                </P>
+                </A>
               }
             />
             <Route
@@ -157,7 +159,6 @@ export default function App() {
             <Route path="/open-source" element={<P><OpenSource /></P>} />
             <Route path="/passport/:userId" element={<P><Passport /></P>} />
             <Route path="/verificacao" element={<P><Verificacao /></P>} />
-            <Route path="/usuarios/:id" element={<P><PerfilPublico /></P>} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </QuizGuard>

@@ -99,3 +99,442 @@ ul,ol { list-style: none; }
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Mobile: padding bottom para o bottom nav */
+@media (max-width: 768px) {
+  .page-body  { padding-bottom: 70px; }
+  .page-inner { padding-bottom: var(--s8); }
+}
+
+
+/* ============================================================
+   FORMS — inputs, selects, textareas, fields, labels
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.field__label {
+  font-size: var(--t-xs);
+  font-weight: var(--w-black);
+  color: var(--ink-600);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.field__hint {
+  font-size: var(--t-xs);
+  color: var(--ink-400);
+  line-height: 1.5;
+}
+
+.field__error {
+  font-size: var(--t-xs);
+  color: var(--red);
+  font-weight: var(--w-bold);
+}
+
+/* Base compartilhada: input, select, textarea */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--s3);
+  background: var(--surface);
+  border: 1.5px solid var(--ink-200);
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  font-family: var(--body);
+  color: var(--ink-900);
+  line-height: 1.5;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow   var(--t-fast) var(--ease);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--ink-300);
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--ink-400);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--ink-900);
+  box-shadow: 0 0 0 3px rgba(17,17,17,.07);
+}
+
+/* Select — arrow customizado */
+.select {
+  padding-right: var(--s8);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23909090' stroke-width='2.5' stroke-linecap='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--s3) center;
+  cursor: pointer;
+}
+
+/* Textarea — altura automática, sem resize horizontal */
+.textarea {
+  height: auto;
+  min-height: 80px;
+  padding: var(--s3);
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Estado desactivado */
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  background: var(--ink-50);
+  color: var(--ink-400);
+  cursor: not-allowed;
+  border-color: var(--ink-100);
+}
+
+/* Estado de erro */
+.input--error,
+.select--error,
+.textarea--error {
+  border-color: var(--red);
+}
+.input--error:focus,
+.select--error:focus,
+.textarea--error:focus {
+  box-shadow: 0 0 0 3px var(--red-soft);
+}
+
+/* Input com ícone à esquerda */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-group .input {
+  padding-left: 36px;
+}
+.input-group__icon {
+  position: absolute;
+  left: var(--s3);
+  color: var(--ink-400);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  height: 40px;
+  padding: 0 var(--s5);
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  font-family: var(--body);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background     var(--t-fast) var(--ease),
+    border-color   var(--t-fast) var(--ease),
+    color          var(--t-fast) var(--ease),
+    box-shadow     var(--t-fast) var(--ease),
+    opacity        var(--t-fast) var(--ease);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primário — vermelho sólido */
+.btn--primary {
+  background: var(--red);
+  color: var(--white);
+  border-color: var(--red);
+}
+.btn--primary:hover {
+  background: var(--red-dim);
+  border-color: var(--red-dim);
+}
+
+/* Secundário — outline */
+.btn--secondary {
+  background: none;
+  color: var(--ink-700);
+  border-color: var(--ink-200);
+}
+.btn--secondary:hover {
+  background: var(--ink-50);
+  border-color: var(--ink-300);
+}
+
+/* Ghost — sem borda */
+.btn--ghost {
+  background: none;
+  color: var(--ink-600);
+  border-color: transparent;
+}
+.btn--ghost:hover {
+  background: var(--ink-50);
+}
+
+/* Danger — para acções destrutivas */
+.btn--danger {
+  background: none;
+  color: var(--red);
+  border-color: var(--red-border);
+}
+.btn--danger:hover {
+  background: var(--red-soft);
+}
+
+/* Tamanhos */
+.btn--sm {
+  height: 32px;
+  padding: 0 var(--s3);
+  font-size: var(--t-xs);
+  border-radius: var(--r-xs);
+}
+.btn--lg {
+  height: 48px;
+  padding: 0 var(--s6);
+  font-size: var(--t-base);
+}
+.btn--full {
+  width: 100%;
+}
+
+/* ============================================================
+   DARK MODE — forms e buttons
+   ============================================================ */
+
+[data-theme="dark"] .input,
+[data-theme="dark"] .select,
+[data-theme="dark"] .textarea {
+  background: var(--surface-2);
+  border-color: var(--ink-200);
+  color: var(--ink-900);
+}
+
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .select:focus,
+[data-theme="dark"] .textarea:focus {
+  border-color: var(--ink-600);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+}
+
+[data-theme="dark"] .input:disabled,
+[data-theme="dark"] .select:disabled,
+[data-theme="dark"] .textarea:disabled {
+  background: var(--ink-50);
+  border-color: var(--ink-100);
+}
+
+[data-theme="dark"] .btn--secondary {
+  color: var(--ink-700);
+  border-color: var(--ink-300);
+}
+[data-theme="dark"] .btn--secondary:hover {
+  background: var(--ink-100);
+}
+
+[data-theme="dark"] .btn--ghost:hover {
+  background: var(--ink-100);
+}
+
+/* ============================================================
+   AUTH PAGES
+   ============================================================ */
+
+.auth-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s8) var(--s4);
+  gap: var(--s4);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.auth-logo__dev    { font-family: var(--display); font-weight: var(--w-black); font-size: 28px; color: var(--ink-900); }
+.auth-logo__angola { font-family: var(--display); font-weight: var(--w-black); font-size: 28px; color: var(--red); }
+.auth-logo__tld    { font-size: var(--t-xs); color: var(--ink-400); font-weight: var(--w-bold); margin-left: 2px; }
+
+.auth-tag {
+  display: inline-block;
+  font-size: var(--t-xs);
+  font-weight: var(--w-black);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--amber);
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--r-full);
+  padding: 4px 14px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s8);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-sm);
+}
+
+.auth-card__title {
+  font-family: var(--display);
+  font-size: var(--t-xl);
+  font-weight: var(--w-black);
+  color: var(--ink-900);
+  margin-bottom: var(--s1);
+}
+
+.auth-card__sub {
+  font-size: var(--t-sm);
+  color: var(--ink-400);
+  margin-bottom: var(--s6);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.auth-footer {
+  font-size: var(--t-sm);
+  color: var(--ink-400);
+  text-align: center;
+}
+
+.auth-footer a {
+  color: var(--red);
+  font-weight: var(--w-bold);
+  text-decoration: none;
+}
+
+/* ============================================================
+   UPLOAD ZONE
+   ============================================================ */
+
+.upload-zone {
+  border: 1.5px dashed var(--ink-200);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.upload-zone:hover {
+  border-color: var(--ink-400);
+  background: var(--ink-50);
+}
+.upload-zone--active {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+.upload-zone__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  padding: var(--s8) var(--s4);
+  text-align: center;
+}
+.upload-zone__label {
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  color: var(--ink-600);
+}
+.upload-zone__hint {
+  font-size: var(--t-xs);
+  color: var(--ink-400);
+}
+
+/* ============================================================
+   BACK BUTTON — padrão reutilizável
+   ============================================================ */
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  color: var(--ink-400);
+  padding: 0;
+  margin-bottom: var(--s5);
+  transition: color var(--t-fast);
+}
+.btn-back:hover { color: var(--ink-700); }
+
+/* ============================================================
+   TOAST — notificação de feedback
+   substituir os style={{ position:'fixed'... }} inline
+   ============================================================ */
+
+.toast--success { background: var(--ink-900); color: var(--white); }
+.toast--error   { background: var(--red);     color: var(--white); }
+
+/* ============================================================
+   NEWPOST — página de criar post
+   ============================================================ */
+.newpost-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  color: var(--ink-400);
+  padding: 0;
+  margin-bottom: var(--s6);
+  transition: color var(--t-fast);
+}
+.newpost-back:hover { color: var(--ink-700); }
+
+/* ============================================================
+   RESPONSIVE UTILITIES
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .auth-card { padding: var(--s6) var(--s5); }
+  .page-inner { padding: var(--s5) var(--s4) var(--s10); }
+}

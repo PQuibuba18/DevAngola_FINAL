@@ -33,8 +33,8 @@ export default function VerifiedBadge({ size = 'sm', lang = 'pt' }) {
       padding:        s.padding,
       borderRadius:   999,
       // Verde escuro — cor de confiança, não de celebração
-      background:     '#E6F4EA',
-      color:          '#1A5C30',
+      background:     'var(--green-soft)',
+      color:          'var(--green)',
       border:         '1px solid #B7DFBF',
       whiteSpace:     'nowrap',
       userSelect:     'none',

@@ -7,49 +7,36 @@ import Navbar from '../components/Navbar';
 import Avatar from '../components/ui/Avatar';
 import Badge  from '../components/ui/Badge';
 import Button from '../components/ui/Button';
-import PostCard from '../components/PostCard';
-import { IconArrowLeft, IconMessage } from '../components/ui/Icons';
 import VerifiedBadge from '../components/ui/VerifiedBadge';
-
-function fmtDate(d, locale) {
-  if (!d) return '';
-  return new Date(d).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
-}
 
 export default function PerfilPublico() {
   const { id }       = useParams();
   const navigate     = useNavigate();
   const { user: me } = useAuth();
   const { lang }     = useLang();
-  const locale       = lang === 'en' ? 'en-GB' : 'pt-AO';
 
-  const [profile,  setProfile]  = useState(null);
-  const [posts,    setPosts]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState('');
-  const [following, setFollowing] = useState(false);
-  const [toggling,  setToggling]  = useState(false);
-  const [starting,  setStarting]  = useState(false);
+  const [profile,   setProfile]  = useState(null);
+  const [posts,     setPosts]    = useState([]);
+  const [loading,   setLoading]  = useState(true);
+  const [error,     setError]    = useState('');
+  const [following, setFollowing]= useState(false);
+  const [toggling,  setToggling] = useState(false);
+  const [starting,  setStarting] = useState(false);
 
   const isOwnProfile = me && String(me.id) === String(id);
 
   const load = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      // Carrega perfil e posts em paralelo
       const [u, p] = await Promise.all([
         api.get(`/users/${id}`),
         api.get(`/posts?userId=${id}&limit=20`),
       ]);
       setProfile(u.data);
-      // Suporta resposta paginada { posts: [] } e array directo []
-      const postList = Array.isArray(p.data) ? p.data : (p.data.posts ?? []);
-      setPosts(postList);
+      setPosts(Array.isArray(p.data) ? p.data : (p.data.posts ?? []));
     } catch {
-      setError(lang === 'en' ? 'User not found.' : 'Utilizador não encontrado.');
-    } finally {
-      setLoading(false);
-    }
+      setError(lang==='en' ? 'User not found.' : 'Utilizador não encontrado.');
+    } finally { setLoading(false); }
   }, [id, lang]);
 
   useEffect(() => { load(); }, [load]);
@@ -70,27 +57,26 @@ export default function PerfilPublico() {
       setFollowing(f => !f);
       setProfile(p => p ? {
         ...p,
-        followers_count: following
-          ? (p.followers_count || 1) - 1
-          : (p.followers_count || 0) + 1,
+        followers_count: following ? (p.followers_count||1)-1 : (p.followers_count||0)+1,
       } : p);
-    } catch {} finally { setToggling(false); }
+    } catch {}
+    finally { setToggling(false); }
   }
 
   if (loading) return (
     <div className="page"><Navbar />
-      <div className="page-body"><div className="page-inner">
+      <div className="page-body" style={{ display:'flex', justifyContent:'center', paddingTop:'var(--s16)' }}>
         <div className="spinner" />
-      </div></div>
+      </div>
     </div>
   );
 
   if (error || !profile) return (
     <div className="page"><Navbar />
       <div className="page-body"><div className="page-inner">
-        <div className="card card--padded" style={{ textAlign:'center', marginTop: 40 }}>
-          <p style={{ color:'var(--ink-400)', marginBottom: 16 }}>{error || 'Utilizador não encontrado.'}</p>
-          <Button variant="secondary" onClick={() => navigate(-1)} style={{ width:'auto' }}>
+        <div className="card card--padded">
+          <p>{error || 'Utilizador não encontrado.'}</p>
+          <Button variant="secondary" onClick={() => navigate(-1)} style={{ width:'auto', marginTop:'var(--s4)' }}>
             ← Voltar
           </Button>
         </div>
@@ -102,86 +88,92 @@ export default function PerfilPublico() {
     <div className="page">
       <Navbar />
       <div className="page-body"><div className="page-inner">
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <div className="page-container">
 
-          {/* Botão voltar */}
-          <button className="newpost-back" onClick={() => navigate(-1)}>
-            <IconArrowLeft className="icon icon--sm" />
-            {lang === 'en' ? 'Back' : 'Voltar'}
-          </button>
+          <button className="btn-back" onClick={() => navigate(-1)}>← Voltar</button>
 
-          {/* Card do perfil */}
-          <div className="card" style={{ padding:'var(--s8)', marginBottom:'var(--s4)', textAlign:'center' }}>
+          {/* Card de perfil */}
+          <div className="card card__body--lg" style={{ marginBottom:'var(--s4)', textAlign:'center' }}>
             <Avatar name={profile.name} src={profile.avatar_url} size="2xl" />
-            <h1 style={{ fontFamily:'var(--display)', fontSize:'var(--t-xl)', fontWeight:'var(--w-black)', margin:'var(--s4) 0 var(--s2)' }}>
-              {profile.name}
-              {profile.verified && (
-                <span style={{ fontSize:'var(--t-sm)', color:'#1E5631', marginLeft: 8 }}>✓</span>
+
+            <div style={{ marginTop:'var(--s4)', marginBottom:'var(--s3)' }}>
+              <div className="row--wrap" style={{ justifyContent:'center', marginBottom:'var(--s2)' }}>
+                <h1 className="heading-lg" style={{ margin:0 }}>{profile.name}</h1>
+                {profile.verified && <VerifiedBadge lang={lang} />}
+              </div>
+              {profile.badge && (
+                <span className={`seal seal--${profile.badge}`} style={{ display:'inline-block', marginBottom:'var(--s2)' }}>
+                  {profile.badge_label}
+                </span>
               )}
-            </h1>
-            {profile.badge && (
-              <span className={`seal seal--${profile.badge}`} style={{ marginBottom:'var(--s2)', display:'inline-block' }}>
-                {profile.badge_label}
-              </span>
-            )}
-            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s2)', marginBottom:'var(--s2)' }}>
-              <Badge level={profile.level} />
+              <div className="row--wrap" style={{ justifyContent:'center' }}>
+                <Badge level={profile.level} />
+              </div>
+              {profile.identifier && (
+                <p className="body-sm" style={{ marginTop:'var(--s2)' }}>{profile.identifier}</p>
+              )}
             </div>
-            {profile.identifier && (
-              <p style={{ color:'var(--ink-400)', fontSize:'var(--t-sm)', marginBottom:'var(--s4)' }}>
-                {profile.identifier}
-              </p>
-            )}
 
             {/* Stats */}
-            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s8)', marginBottom:'var(--s6)', borderTop:'var(--line)', borderBottom:'var(--line)', padding:'var(--s4) 0' }}>
+            <div className="row" style={{ justifyContent:'center', gap:'var(--s8)', padding:'var(--s4) 0', borderTop:'var(--line)', borderBottom:'var(--line)', marginBottom:'var(--s4)' }}>
               {[
-                { label: lang==='en'?'Posts':'Posts',             value: posts.length },
-                { label: lang==='en'?'Followers':'Seguidores',    value: profile.followers_count || 0 },
-                { label: lang==='en'?'Following':'A seguir',      value: profile.following_count || 0 },
+                { label:'Posts',      value: posts.length },
+                { label: lang==='en'?'Followers':'Seguidores', value: profile.followers_count||0 },
+                { label: lang==='en'?'Following':'A seguir',   value: profile.following_count||0 },
               ].map(s => (
-                <div key={s.label} style={{ textAlign:'center' }}>
-                  <div style={{ fontFamily:'var(--display)', fontSize:'var(--t-xl)', fontWeight:'var(--w-black)', color:'var(--ink-900)' }}>{s.value}</div>
-                  <div style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)', fontWeight:'var(--w-bold)', textTransform:'uppercase', letterSpacing:'.06em' }}>{s.label}</div>
+                <div key={s.label} className="stat-block">
+                  <span className="stat-block__value">{s.value}</span>
+                  <span className="stat-block__label">{s.label}</span>
                 </div>
               ))}
             </div>
 
             {/* Acções */}
-            <div style={{ display:'flex', justifyContent:'center', gap:'var(--s3)' }}>
-              <Button as={Link} to={`/passport/${profile.id}`} style={{ width:'auto' }}>
-                Passport Profissional
-              </Button>
+            <div className="row--wrap" style={{ justifyContent:'center' }}>
+              <Link to={`/passport/${profile.id}`}>
+                <Button style={{ width:'auto' }}>Passport Profissional</Button>
+              </Link>
               {isOwnProfile ? (
-                <Button as={Link} to="/perfil" variant="secondary" style={{ width:'auto' }}>
-                  {lang==='en' ? 'Edit profile' : 'Editar perfil'}
-                </Button>
+                <Link to="/perfil">
+                  <Button variant="secondary" style={{ width:'auto' }}>
+                    {lang==='en' ? 'Edit profile' : 'Editar perfil'}
+                  </Button>
+                </Link>
               ) : me && (
                 <>
-                  <Button onClick={toggleFollow} loading={toggling} style={{ width:'auto' }}
+                  <Button
+                    onClick={toggleFollow} loading={toggling} style={{ width:'auto' }}
                     variant={following ? 'secondary' : 'primary'}>
                     {following
                       ? (lang==='en' ? 'Unfollow' : 'Deixar de seguir')
                       : (lang==='en' ? 'Follow' : 'Seguir')}
                   </Button>
                   <Button variant="secondary" onClick={startChat} loading={starting} style={{ width:'auto' }}>
-                    <IconMessage className="icon icon--sm" /> {lang==='en'?'Message':'Mensagem'}
+                    {lang==='en' ? 'Message' : 'Mensagem'}
                   </Button>
                 </>
               )}
             </div>
           </div>
 
-          {/* Posts do utilizador */}
-          <h2 style={{ fontSize:'var(--t-md)', fontWeight:'var(--w-black)', color:'var(--ink-900)', marginBottom:'var(--s4)' }}>
-            Posts ({posts.length})
-          </h2>
+          {/* Posts */}
+          <h2 className="section-header">Posts ({posts.length})</h2>
           {posts.length === 0 ? (
-            <div className="card card--padded" style={{ textAlign:'center', color:'var(--ink-400)' }}>
+            <div className="card card--padded">
               {lang==='en' ? 'No posts yet.' : 'Sem posts ainda.'}
             </div>
           ) : (
-            posts.map(p => <PostCard key={p.id} post={p} />)
+            <div className="stack--sm">
+              {posts.map(p => (
+                <div key={p.id} className="card card__body">
+                  <h3 className="heading-sm" style={{ marginBottom:'var(--s1)' }}>{p.title}</h3>
+                  <p className="body-sm">{p.content?.slice(0,160)}{p.content?.length>160?'...':''}</p>
+                  <div className="meta-line" style={{ marginTop:'var(--s2)' }}>
+                    <span>{new Date(p.created_at).toLocaleDateString('pt-AO')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div></div>

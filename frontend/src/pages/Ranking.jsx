@@ -6,11 +6,11 @@ import Badge  from '../components/ui/Badge';
 import { useLang } from '../context/LanguageContext';
 
 const POSITIONS = [
-  { label:'1.º', color:'#C8860A', bg:'#FEF7E0' },
-  { label:'2.º', color:'#6B6B6B', bg:'#F0F0F0' },
-  { label:'3.º', color:'#A0522D', bg:'#FDF0E8' },
-  { label:'4.º', color:'#909090', bg:'#F5F5F5' },
-  { label:'5.º', color:'#909090', bg:'#F5F5F5' },
+  { label:'1.º', textColor:'var(--amber-mid)', bgColor:'var(--amber-soft)', borderColor:'var(--amber-mid)' },
+  { label:'2.º', textColor:'var(--ink-500)',   bgColor:'var(--ink-100)',    borderColor:'var(--ink-300)'   },
+  { label:'3.º', textColor:'var(--amber)',      bgColor:'var(--amber-soft)', borderColor:'var(--amber)'     },
+  { label:'4.º', textColor:'var(--ink-400)',   bgColor:'var(--ink-50)',     borderColor:'var(--ink-200)'   },
+  { label:'5.º', textColor:'var(--ink-400)',   bgColor:'var(--ink-50)',     borderColor:'var(--ink-200)'   },
 ];
 
 export default function Ranking() {
@@ -30,109 +30,104 @@ export default function Ranking() {
     <div className="page">
       <Navbar />
       <div className="page-body"><div className="page-inner">
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <div className="page-container">
 
-          {/* Cabeçalho limpo */}
-          <div style={{ marginBottom: 'var(--s8)' }}>
-            <h1 style={{
-              fontFamily: 'var(--display)', fontSize: 'var(--t-2xl)',
-              fontWeight: 'var(--w-black)', letterSpacing: '-.03em',
-              color: 'var(--ink-900)', marginBottom: 'var(--s2)',
-            }}>
-              {lang === 'en' ? 'Top Developers' : 'Top Programadores'}
-            </h1>
-            <p style={{ fontSize: 'var(--t-sm)', color: 'var(--ink-400)' }}>
-              {lang === 'en'
-                ? 'Ranked by activity: posts × 1pt + likes × 2pts'
-                : 'Ordenado por actividade: posts × 1pt + gostos × 2pts'}
-            </p>
+          <div className="page-header">
+            <div className="page-header__text">
+              <h1 className="page-header__title">
+                {lang === 'en' ? 'Top Developers' : 'Top Programadores'}
+              </h1>
+              <p className="page-header__sub">
+                {lang === 'en'
+                  ? 'Ranked by activity: posts × 1pt + likes × 2pts'
+                  : 'Ordenado por actividade: posts × 1pt + gostos × 2pts'}
+              </p>
+            </div>
           </div>
 
           {loading && <div className="spinner" />}
 
           {error && (
-            <div className="card card--padded" style={{ textAlign:'center', color:'var(--ink-400)' }}>
+            <div className="card card--padded">
               {lang === 'en' ? 'Could not load ranking.' : 'Não foi possível carregar o ranking.'}
             </div>
           )}
 
           {!loading && !error && ranking.length === 0 && (
-            <div className="card card--padded" style={{ textAlign:'center', color:'var(--ink-400)' }}>
+            <div className="card card--padded">
               {lang === 'en' ? 'No data yet.' : 'Sem dados ainda.'}
             </div>
           )}
 
-          <div style={{ display:'flex', flexDirection:'column', gap:'var(--s3)' }}>
+          <div className="stack--sm">
             {ranking.map((dev, i) => {
               const pos = POSITIONS[i] || POSITIONS[4];
               return (
-                <div key={dev.id} className="card" style={{
-                  display: 'flex', alignItems: 'center', gap: 'var(--s4)',
-                  padding: 'var(--s4) var(--s6)',
-                  borderLeft: `4px solid ${pos.color}`,
-                }}>
-                  {/* Posição */}
-                  <div style={{
-                    minWidth: 44, height: 44, borderRadius: 'var(--r-sm)',
-                    background: pos.bg, display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <span style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:'var(--t-base)', color: pos.color }}>
-                      {pos.label}
-                    </span>
-                  </div>
+                <div key={dev.id} className="card card--accent-left card__body--lg"
+                  style={{ borderLeftColor: pos.borderColor }}>
+                  <div className="row" style={{ alignItems:'center', gap:'var(--s4)' }}>
 
-                  {/* Avatar */}
-                  <Avatar name={dev.name} src={dev.avatar_url} size="md" />
-
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:'var(--s2)', marginBottom: 4, flexWrap:'wrap' }}>
-                      <span style={{ fontWeight:'var(--w-black)', fontSize:'var(--t-base)', color:'var(--ink-900)' }}>
-                        {dev.name}
+                    {/* Posição */}
+                    <div style={{
+                      minWidth:44, height:44, borderRadius:'var(--r-sm)',
+                      background: pos.bgColor, display:'flex',
+                      alignItems:'center', justifyContent:'center', flexShrink:0,
+                    }}>
+                      <span style={{
+                        fontFamily:'var(--display)', fontWeight:'var(--w-black)',
+                        fontSize:'var(--t-base)', color: pos.textColor,
+                      }}>
+                        {pos.label}
                       </span>
-                      {dev.badge && (
-                        <span className={`seal seal--${dev.badge}`}>{dev.badge_label}</span>
-                      )}
                     </div>
-                    <div style={{ display:'flex', alignItems:'center', gap:'var(--s3)', flexWrap:'wrap' }}>
-                      <Badge level={dev.level} />
-                      {dev.identifier && (
-                        <span style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)' }}>{dev.identifier}</span>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Estatísticas */}
-                  <div style={{ display:'flex', gap:'var(--s5)', flexShrink: 0 }}>
-                    <div style={{ textAlign:'center' }}>
-                      <div style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:'var(--t-md)', color:'var(--ink-900)', lineHeight:1 }}>
-                        {dev.total_posts}
+                    {/* Avatar */}
+                    <Avatar name={dev.name} src={dev.avatar_url} size="md" />
+
+                    {/* Info */}
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div className="row--wrap" style={{ marginBottom:'var(--s1)' }}>
+                        <span className="heading-sm">{dev.name}</span>
+                        {dev.badge && (
+                          <span className={`seal seal--${dev.badge}`}>{dev.badge_label}</span>
+                        )}
                       </div>
-                      <div style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)', marginTop: 2 }}>
-                        posts
+                      <div className="row--wrap">
+                        <Badge level={dev.level} />
+                        {dev.identifier && (
+                          <span className="caption">{dev.identifier}</span>
+                        )}
                       </div>
                     </div>
-                    <div style={{ textAlign:'center' }}>
-                      <div style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:'var(--t-md)', color:'var(--red)', lineHeight:1 }}>
-                        {dev.total_likes}
+
+                    {/* Estatísticas */}
+                    <div className="row" style={{ gap:'var(--s5)', flexShrink:0 }}>
+                      <div className="stat-block">
+                        <span className="stat-block__value" style={{ fontSize:'var(--t-md)' }}>
+                          {dev.total_posts}
+                        </span>
+                        <span className="stat-block__label">posts</span>
                       </div>
-                      <div style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)', marginTop: 2 }}>
-                        {lang === 'en' ? 'likes' : 'gostos'}
+                      <div className="stat-block">
+                        <span className="stat-block__value" style={{ fontSize:'var(--t-md)', color:'var(--red)' }}>
+                          {dev.total_likes}
+                        </span>
+                        <span className="stat-block__label">
+                          {lang === 'en' ? 'likes' : 'gostos'}
+                        </span>
                       </div>
-                    </div>
-                    <div style={{ textAlign:'center', borderLeft:'var(--line)', paddingLeft:'var(--s5)' }}>
-                      <div style={{ fontFamily:'var(--display)', fontWeight:'var(--w-black)', fontSize:'var(--t-lg)', color: pos.color, lineHeight:1 }}>
-                        {dev.score}
+                      <div className="stat-block" style={{ paddingLeft:'var(--s5)', borderLeft:'var(--line)' }}>
+                        <span className="stat-block__value" style={{ fontSize:'var(--t-lg)', color: pos.textColor }}>
+                          {dev.score}
+                        </span>
+                        <span className="stat-block__label">pts</span>
                       </div>
-                      <div style={{ fontSize:'var(--t-xs)', color:'var(--ink-400)', marginTop: 2 }}>pts</div>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
-
         </div>
       </div></div>
     </div>
